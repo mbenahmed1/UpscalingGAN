@@ -1,3 +1,4 @@
 # UpscalingGAN
+This repository contains a Image Upscaling project using a Generative Adversarial Network (GAN) model. 
 
-TODO
+work in progress
