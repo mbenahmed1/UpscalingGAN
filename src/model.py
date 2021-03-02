@@ -1,12 +1,24 @@
-# Generator model
+"""Contains the GAN model definition.
+
+This file contains the model definition of the GAN
+which consists of the Generator and the Discriminator Part.
+"""
+
+# imports
 import tensorflow.keras.layers as layers
 import tensorflow.keras.activations as activations
 
 
 class Generator(tf.keras.Model):
+    """A class that represents the Generator part of the model.
+
+    This class represents the Generator part of the neural
+    network model and its layers.
+
+    """
 
     def __init__(self):
-
+        """Inits the Generator."""
         super(Generator, self).__init__()
 
         self.input_1 = layers.Dense(
@@ -33,8 +45,13 @@ class Generator(tf.keras.Model):
         #self.act_4 = activations.sigmoid
         self.act_4 = layers.LeakyReLU()
 
-    def call(self, x, training):
+    def call(self, x, training: bool):
+        """Runs the data through the layers.
 
+        Attributes:
+            x:              the data
+            training:       training flag
+        """
         x = self.input_1(x)
         x = self.batch_norm_1(x, training)
         x = self.act_1(x)
@@ -57,9 +74,15 @@ class Generator(tf.keras.Model):
 # Discriminator Model
 
 class Discriminator(tf.keras.Model):
+    """A class that represents the Discriminator part of the model.
+
+    This class represents the Discriminator part of the neural
+    network model and its layers.
+
+    """
 
     def __init__(self):
-
+        """Inits the Discriminator."""
         super(Discriminator, self).__init__()
 
         self.conv_1 = layers.Conv2D(64, (5, 5), strides=(
@@ -75,8 +98,13 @@ class Discriminator(tf.keras.Model):
         self.flatten_3 = layers.Flatten()
         self.out_3 = layers.Dense(1)
 
-    def call(self, x, training):
+    def call(self, x, training: bool):
+        """Runs the data through the layers.
 
+        Attributes:
+            x:              the data
+            training:       training flag
+        """
         x = self.conv_1(x)
         x = self.act_1(x)
         x = self.dropout_1(x)
