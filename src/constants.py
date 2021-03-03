@@ -2,6 +2,9 @@
 This file contains all the constants used in the project. 
 """
 
+# general
+USEGPU = True
+
 # file I/O
 IMAGEFILEEXTENSION = "jpg"
 MAXIMAGEWIDTH = 8192

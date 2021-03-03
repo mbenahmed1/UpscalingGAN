@@ -8,6 +8,11 @@ and preparing train data.
 import tensorflow as tf
 import utils
 import constants
+import os
+
+# disabling gpu if needed
+if not constants.USEGPU:
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 def load(path_tensor, other):
