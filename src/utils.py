@@ -1,6 +1,7 @@
 """Contains utility functions.
 
 This file contains utility functions such as file I/O
+and data augmentation.
 """
 
 # imports
@@ -109,7 +110,7 @@ def prepare_images(path: str) -> tf.Tensor:
     return full_image
 
 
-def make_full_low_pairs(full_image: tf.Tensor):
+def make_full_low_pairs(full_image: tf.Tensor) -> tf.Tensor:
     """Makes pairs of full and low resolution images. 
     Therefore, it resizes the full size image.
 
