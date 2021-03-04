@@ -83,7 +83,30 @@ def path_to_tensor(path):
     path_strings = []
     for path in image_paths:
         path_strings.append(path.as_posix())
-    
+
     # converting list of strings to tensor
     image_paths = tf.convert_to_tensor(path_strings, dtype=tf.string)
     return image_paths
+
+
+def prepare_images(path: str):
+    """Reads paths, load them into tensors and does image preprocessing
+    
+    Parameters:
+        path:       the path to the directory of the images
+    """
+    image = tf.io.read_file(path)
+    image = tf.image.decode_jpeg(image)
+    image = tf.image.convert_image_dtype(image, tf.float32)
+
+    # crop and pad if image does not fit in target size
+    full_image = tf.image.resize_with_crop_or_pad(
+        image, constants.FULLIMAGESIZE, constants.FULLIMAGESIZE)
+    full_image = tf.image.per_image_standardization(full_image)
+
+    # creating smaller low resolution image from full resolution image
+    low_image = tf.image.resize(
+        full_image, [constants.LOWIMAGESIZE, constants.LOWIMAGESIZE])
+    low_image = tf.image.per_image_standardization(low_image)
+
+    return low_image, full_image
