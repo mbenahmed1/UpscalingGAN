@@ -25,7 +25,7 @@ list_ds = tf.data.Dataset.list_files(constants.DATAPATH)
 # loading and preparing images
 ds = list_ds.map(utils.prepare_images)
 
-
+# TODO: make random from image to image
 # applying some augmentations for testing
 ds = ds.map(lambda x: utils.brighten(x, 0.2, seed))
 ds = ds.map(lambda x: utils.contrast(x, 0.5, 0.8, seed))
@@ -33,8 +33,12 @@ ds = ds.map(lambda x: utils.flip_left_right(x))
 ds = ds.map(lambda x: utils.flip_up_down(x))
 ds = ds.map(lambda x: utils.saturate(x, 2.1, 3.2, seed))
 
+# making pairs of the original and the scaled images
+ds = ds.map(utils.make_full_low_pairs)
 
 # plotting some images from the ds
-for full_image in ds.take(5):
+for low_image, full_image in ds.take(5):
+    plt.imshow(low_image)
+    plt.show()
     plt.imshow(full_image)
     plt.show()

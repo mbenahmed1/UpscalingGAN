@@ -104,10 +104,20 @@ def prepare_images(path: str) -> tf.Tensor:
     # crop and pad if image does not fit in target size
     full_image = tf.image.resize_with_crop_or_pad(
         image, constants.FULLIMAGESIZE, constants.FULLIMAGESIZE)
-    #full_image = tf.image.per_image_standardization(full_image)
+    # full_image = tf.image.per_image_standardization(full_image)
 
     return full_image
 
+
+def make_full_low_pairs(full_image: tf.Tensor):
+    """Makes pairs of full and low resolution images. 
+    Therefore, it resizes the full size image.
+
+    Parameters:
+        full_image:     the full size image
+    """
+    low_image = tf.image.resize(full_image, [constants.LOWIMAGESIZE, constants.LOWIMAGESIZE])
+    return low_image, full_image
 
 def visualize(original: tf.Tensor, augmented: tf.Tensor):
     """Visualizes original image vs augmented.
