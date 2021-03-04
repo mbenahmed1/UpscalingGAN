@@ -6,6 +6,7 @@ This file contains utility functions such as file I/O
 # imports
 import tensorflow as tf
 import pathlib
+import matplotlib.pyplot as plt
 import constants
 import PIL
 import PIL.Image
@@ -67,7 +68,7 @@ def load_images(path: str):
     return np.asarray(array_list, dtype=object)
 
 
-def path_to_tensor(path):
+def path_to_tensor(path: str) -> tf.Tensor:
     """Loads paths from directory path and creates tensor
 
     Parameters:
@@ -89,9 +90,10 @@ def path_to_tensor(path):
     return image_paths
 
 
-def prepare_images(path: str):
-    """Reads paths, load them into tensors and does image preprocessing
-    
+def prepare_images(path: str) -> tf.Tensor:
+    """Reads paths, load them into tensors and does image preprocessing,
+    such as converting dtype and resizing and cropping
+
     Parameters:
         path:       the path to the directory of the images
     """
@@ -102,11 +104,75 @@ def prepare_images(path: str):
     # crop and pad if image does not fit in target size
     full_image = tf.image.resize_with_crop_or_pad(
         image, constants.FULLIMAGESIZE, constants.FULLIMAGESIZE)
-    full_image = tf.image.per_image_standardization(full_image)
+    #full_image = tf.image.per_image_standardization(full_image)
 
-    # creating smaller low resolution image from full resolution image
-    low_image = tf.image.resize(
-        full_image, [constants.LOWIMAGESIZE, constants.LOWIMAGESIZE])
-    low_image = tf.image.per_image_standardization(low_image)
+    return full_image
 
-    return low_image, full_image
+
+def visualize(original: tf.Tensor, augmented: tf.Tensor):
+    """Visualizes original image vs augmented.
+
+    Paramers:
+        original:   original image
+        augmented:  augmented image
+    """
+    fig = plt.figure()
+    plt.subplot(1, 2, 1)
+    plt.title('Original image')
+    plt.imshow(original)
+
+    plt.subplot(1, 2, 2)
+    plt.title('Augmented image')
+    plt.imshow(augmented)
+
+
+def flip_left_right(image: tf.Tensor) -> tf.Tensor:
+    """Takes an image and flips it left-right
+
+    Parameters:
+        image:  the image to be modified
+    """
+    return tf.image.flip_left_right(image)
+
+
+def flip_up_down(image: tf.Tensor) -> tf.Tensor:
+    """Takes an image and flips it up-down
+
+    Parameters:
+        image:  the image to be modified
+    """
+    return tf.image.flip_up_down(image)
+
+
+def saturate(image: tf.Tensor, lower: float, upper: float, seed: tf.Tensor) -> tf.Tensor:
+    """Takes an image and saturates it by some random factor
+
+    Parameters:
+        image:  the image to be modified
+        lower:  lower bound for saturation adjustment
+        upper:  upper bound for saturation adjustment
+        seed:   the random seed
+    """
+    return tf.image.stateless_random_saturation(image, lower, upper, seed)
+
+
+def brighten(image: tf.Tensor, max_delta: float, seed: tf.Tensor) -> tf.Tensor:
+    """Takes an image and adjusts its brightness by some random factor
+
+    Parameters:
+        image:  the image to be modified
+        max_delta: the maximum brightness delta
+        seed:   the random seed
+    """
+    return tf.image.stateless_random_brightness(image, max_delta, seed)
+
+def contrast(image: tf.Tensor, lower: float, upper: float, seed: tf.Tensor) -> tf.Tensor:
+    """Takes an image and adjusts its contrast by some random factor
+
+    Parameters:
+        image:  the image to be modified
+        lower:  the lower bound for contrast adjustment
+        upper:  the upper bound for constrast adjustment
+        seed:   the random seed
+    """
+    return tf.image.stateless_random_contrast(image, lower, upper, seed)
