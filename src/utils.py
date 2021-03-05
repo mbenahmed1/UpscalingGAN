@@ -101,6 +101,9 @@ def prepare_images(path: str) -> tf.Tensor:
     image = tf.io.read_file(path)
     image = tf.image.decode_jpeg(image)
     image = tf.image.convert_image_dtype(image, tf.float32)
+    if image.shape[2] == 3:
+        image = tf.image.rgb_to_grayscale(image)
+    
 
     # crop and pad if image does not fit in target size
     full_image = tf.image.resize_with_crop_or_pad(
@@ -143,7 +146,11 @@ def flip_left_right(image: tf.Tensor) -> tf.Tensor:
     Parameters:
         image:  the image to be modified
     """
-    return tf.image.flip_left_right(image)
+    if tf.random.uniform([1], 0, 1) < constants.AUGMENTATIONPROBABILITY:
+        return tf.image.flip_left_right(image)
+    else:
+        return image
+    
 
 
 def flip_up_down(image: tf.Tensor) -> tf.Tensor:
@@ -152,7 +159,11 @@ def flip_up_down(image: tf.Tensor) -> tf.Tensor:
     Parameters:
         image:  the image to be modified
     """
-    return tf.image.flip_up_down(image)
+    if tf.random.uniform([1], 0, 1) < constants.AUGMENTATIONPROBABILITY:
+        return tf.image.flip_up_down(image)
+    else:
+        return image
+    
 
 
 def saturate(image: tf.Tensor, lower: float, upper: float, seed: tf.Tensor) -> tf.Tensor:
@@ -164,7 +175,11 @@ def saturate(image: tf.Tensor, lower: float, upper: float, seed: tf.Tensor) -> t
         upper:  upper bound for saturation adjustment
         seed:   the random seed
     """
-    return tf.image.stateless_random_saturation(image, lower, upper, seed)
+    if tf.random.uniform([1], 0, 1) < constants.AUGMENTATIONPROBABILITY:
+        return tf.image.stateless_random_saturation(image, lower, upper, seed)
+    else:
+        return image
+    
 
 
 def brighten(image: tf.Tensor, max_delta: float, seed: tf.Tensor) -> tf.Tensor:
@@ -175,7 +190,11 @@ def brighten(image: tf.Tensor, max_delta: float, seed: tf.Tensor) -> tf.Tensor:
         max_delta: the maximum brightness delta
         seed:   the random seed
     """
-    return tf.image.stateless_random_brightness(image, max_delta, seed)
+    if tf.random.uniform([1], 0, 1) < constants.AUGMENTATIONPROBABILITY:
+        return tf.image.stateless_random_brightness(image, max_delta, seed)
+    else:
+        return image
+    
 
 def contrast(image: tf.Tensor, lower: float, upper: float, seed: tf.Tensor) -> tf.Tensor:
     """Takes an image and adjusts its contrast by some random factor
@@ -186,4 +205,7 @@ def contrast(image: tf.Tensor, lower: float, upper: float, seed: tf.Tensor) -> t
         upper:  the upper bound for constrast adjustment
         seed:   the random seed
     """
-    return tf.image.stateless_random_contrast(image, lower, upper, seed)
+    if tf.random.uniform([1], 0, 1) < constants.AUGMENTATIONPROBABILITY:
+        return tf.image.stateless_random_contrast(image, lower, upper, seed)
+    else:
+        return image
