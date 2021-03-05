@@ -5,6 +5,7 @@ which consists of the Generator and the Discriminator Part.
 """
 
 # imports
+import tensorflow as tf
 import tensorflow.keras.layers as layers
 import tensorflow.keras.activations as activations
 
@@ -22,7 +23,7 @@ class Generator(tf.keras.Model):
         super(Generator, self).__init__()
 
         self.input_1 = layers.Dense(
-            7*7*256, use_bias=False, input_shape=(100,))
+7*7*256, use_bias=False, input_shape=(100,))
         self.batch_norm_1 = layers.BatchNormalization()
         #self.act_1 = activations.sigmoid
         self.act_1 = layers.LeakyReLU()
