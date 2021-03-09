@@ -46,6 +46,10 @@ def train(dataset, epochs):
     for epoch in range(epochs):
         start = time.time()
 
+    # DEBUG
+    tessst = dataset.take(1)
+    print(tessst)
+
     for data in dataset:
         (loss1, loss2) = train_step(data)
         loss_gen.append(loss1)
@@ -54,15 +58,17 @@ def train(dataset, epochs):
     print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
 
 
-@tf.function
+#@tf.function
 def train_step(images):
     noise = tf.random.normal([constants.BATCHSIZE, noise_dim])
+    image_lowRes = images[0]
+    images_highRes = images[1]
 
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-        generated_images = generator(noise, training=True)
+        generated_image = generator(image_lowRes, training=True)
 
-        real_output = discriminator(images, training=True)
-        fake_output = discriminator(generated_images, training=True)
+        real_output = discriminator(images_highRes, training=True)
+        fake_output = discriminator(generated_image, training=True)
 
         gen_loss = generator_loss(fake_output)
         disc_loss = discriminator_loss(real_output, fake_output)
@@ -85,13 +91,16 @@ rng = tf.random.Generator.from_seed(123, alg='philox')
 seed = rng.make_seeds(2)[1]
 
 # loading paths
-list_ds = tf.data.Dataset.list_files(constants.DATAPATH)
+#list_ds = tf.data.Dataset.list_files(constants.DATAPATH)
 
 # loading and preparing images
-ds = list_ds.map(utils.prepare_images, constants.NUMPARALLELCALLS)
+#ds = list_ds.map(utils.prepare_images, constants.NUMPARALLELCALLS)
+
+ds = tf.keras.preprocessing.image_dataset_from_directory('../data', label_mode=None, image_size=(512, 512), batch_size=1)
+print('Einlesen der Bilder erfolgreich')
 
 # size of the dataset
-size = len(list_ds)
+#size = len(list_ds)
 
 # TODO: make random from image to image
 # applying some augmentations for testing
@@ -108,23 +117,28 @@ ds = ds.map(lambda x: utils.contrast(x, constants.CONTRASTMIN,
 ds = ds.map(utils.make_full_low_pairs, constants.NUMPARALLELCALLS)
 
 # splitting dataset into test and train
-test_dataset = ds.take(int(constants.TESTSPLITSIZE * size))
-train_dataset = ds.skip(int(constants.TESTSPLITSIZE * size))
+test_dataset = ds.take(int(1000))
+train_dataset = ds.skip(int(1000)).take(1000)
 
 # plot some samples
+"""
 for low_image, full_image in test_dataset.take(5):
+    print(low_image.shape, full_image.shape)
     plt.imshow(low_image)
     plt.show()
     plt.imshow(full_image)
     plt.show()
-
+"""
 # batching
-test_dataset = test_dataset.batch(constants.BATCHSIZE)
-train_dataset = train_dataset.batch(constants.BATCHSIZE)
+#test_dataset = test_dataset.batch(constants.BATCHSIZE)
+#train_dataset = train_dataset.batch(constants.BATCHSIZE)
+
+#test_dataset = test_dataset.batch(1)
+#train_dataset = train_dataset.batch(1)
 
 # shuffling
-test_dataset = test_dataset.shuffle(buffer_size=constants.BUFFERSIZE)
-train_dataset = train_dataset.shuffle(buffer_size=constants.BUFFERSIZE)
+#test_dataset = test_dataset.shuffle(buffer_size=constants.BUFFERSIZE)
+#train_dataset = train_dataset.shuffle(buffer_size=constants.BUFFERSIZE)
 
 # prefetching
 train_dataset = train_dataset.prefetch(constants.PREFETCHSIZE)
@@ -147,5 +161,6 @@ seed = tf.random.normal([num_examples_to_generate, noise_dim])
 loss_gen = []
 loss_desc = []
 
+print("beginne Training")
 
-train(train_dataset, constants.EPOCHS)
+train(test_dataset, constants.EPOCHS)
