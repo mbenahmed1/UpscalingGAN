@@ -22,15 +22,18 @@ class Generator(tf.keras.Model):
         """Inits the Generator."""
         super(Generator, self).__init__()
 
+
+        """
         self.input_1 = layers.Dense(
 7*7*256, use_bias=False, input_shape=(100,))
         self.batch_norm_1 = layers.BatchNormalization()
         #self.act_1 = activations.sigmoid
         self.act_1 = layers.LeakyReLU()
         self.reshape_1 = layers.Reshape((7, 7, 256))
+        """
 
         self.conv_2 = layers.Conv2DTranspose(
-            128, (5, 5), strides=(1, 1), padding='same', use_bias=False)
+            128, (5, 5), strides=(1, 1), padding='same', use_bias=False, input_shape=(128, 128, 3))
         self.batch_norm_2 = layers.BatchNormalization()
         #self.act_2 = activations.sigmoid
         self.act_2 = layers.LeakyReLU()
@@ -42,7 +45,7 @@ class Generator(tf.keras.Model):
         self.act_3 = layers.LeakyReLU()
 
         self.conv_4 = layers.Conv2DTranspose(
-            1, (5, 5), strides=(2, 2), padding='same', use_bias=False)
+            3, (5, 5), strides=(2, 2), padding='same', use_bias=False)
         #self.act_4 = activations.sigmoid
         self.act_4 = layers.LeakyReLU()
 
@@ -53,10 +56,13 @@ class Generator(tf.keras.Model):
             x:              the data
             training:       training flag
         """
+
+        """
         x = self.input_1(x)
         x = self.batch_norm_1(x, training)
         x = self.act_1(x)
         x = self.reshape_1(x)
+        """
 
         x = self.conv_2(x)
         x = self.batch_norm_2(x, training)
@@ -87,7 +93,7 @@ class Discriminator(tf.keras.Model):
         super(Discriminator, self).__init__()
 
         self.conv_1 = layers.Conv2D(64, (5, 5), strides=(
-            2, 2), padding='same', input_shape=[28, 28, 1])
+            2, 2), padding='same', input_shape=(512, 512, 3))
         self.act_1 = activations.sigmoid
         self.dropout_1 = layers.Dropout(0.3)
 
