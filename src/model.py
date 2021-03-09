@@ -8,6 +8,7 @@ which consists of the Generator and the Discriminator Part.
 import tensorflow as tf
 import tensorflow.keras.layers as layers
 import tensorflow.keras.activations as activations
+import constants
 
 
 class Generator(tf.keras.Model):
@@ -33,7 +34,7 @@ class Generator(tf.keras.Model):
         """
 
         self.conv_2 = layers.Conv2DTranspose(
-            128, (5, 5), strides=(1, 1), padding='same', use_bias=False, input_shape=(128, 128, 3))
+            128, (5, 5), strides=(1, 1), padding='same', use_bias=False, input_shape=(constants.LOWIMAGESIZE, constants.LOWIMAGESIZE, constants.NUMCHANNELS))
         self.batch_norm_2 = layers.BatchNormalization()
         #self.act_2 = activations.sigmoid
         self.act_2 = layers.LeakyReLU()
@@ -45,7 +46,7 @@ class Generator(tf.keras.Model):
         self.act_3 = layers.LeakyReLU()
 
         self.conv_4 = layers.Conv2DTranspose(
-            3, (5, 5), strides=(2, 2), padding='same', use_bias=False)
+            constants.NUMCHANNELS, (5, 5), strides=(2, 2), padding='same', use_bias=False)
         #self.act_4 = activations.sigmoid
         self.act_4 = layers.LeakyReLU()
 
@@ -93,7 +94,7 @@ class Discriminator(tf.keras.Model):
         super(Discriminator, self).__init__()
 
         self.conv_1 = layers.Conv2D(64, (5, 5), strides=(
-            2, 2), padding='same', input_shape=(512, 512, 3))
+            2, 2), padding='same', input_shape=(constants.FULLIMAGESIZE, constants.FULLIMAGESIZE, constants.NUMCHANNELS))
         self.act_1 = activations.sigmoid
         self.dropout_1 = layers.Dropout(0.3)
 
