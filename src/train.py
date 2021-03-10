@@ -46,19 +46,16 @@ def train(dataset, epochs):
     for epoch in range(epochs):
         start = time.time()
 
-    # DEBUG
-    tessst = dataset.take(1)
-    print(tessst)
+    
+        for data in dataset:
+            (loss1, loss2) = train_step(data)
+            loss_gen.append(loss1)
+            loss_desc.append(loss2)
 
-    for data in dataset:
-        (loss1, loss2) = train_step(data)
-        loss_gen.append(loss1)
-        loss_desc.append(loss2)
-
-    print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
+        print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
 
 
-#@tf.function
+@tf.function
 def train_step(images):
     noise = tf.random.normal([constants.BATCHSIZE, noise_dim])
     image_lowRes = images[0]
@@ -91,16 +88,16 @@ rng = tf.random.Generator.from_seed(123, alg='philox')
 seed = rng.make_seeds(2)[1]
 
 # loading paths
-#list_ds = tf.data.Dataset.list_files(constants.DATAPATH)
+list_ds = tf.data.Dataset.list_files(constants.DATAPATH)
 
 # loading and preparing images
-#ds = list_ds.map(utils.prepare_images, constants.NUMPARALLELCALLS)
+ds = list_ds.map(utils.prepare_images, constants.NUMPARALLELCALLS)
 
-ds = tf.keras.preprocessing.image_dataset_from_directory('../data', label_mode=None, image_size=(512, 512), batch_size=1)
-print('Einlesen der Bilder erfolgreich')
+#ds = tf.keras.preprocessing.image_dataset_from_directory('../data', label_mode=None, image_size=(512, 512), batch_size=1)
+#print('Einlesen der Bilder erfolgreich')
 
 # size of the dataset
-#size = len(list_ds)
+size = len(list_ds)
 
 # TODO: make random from image to image
 # applying some augmentations for testing
@@ -117,28 +114,28 @@ ds = ds.map(lambda x: utils.contrast(x, constants.CONTRASTMIN,
 ds = ds.map(utils.make_full_low_pairs, constants.NUMPARALLELCALLS)
 
 # splitting dataset into test and train
-test_dataset = ds.take(int(1000))
-train_dataset = ds.skip(int(1000)).take(1000)
+# test_dataset = ds.take(int(1000))
+# train_dataset = ds.skip(int(1000)).take(1000)
+
+test_dataset = ds.take(int(size * constants.TESTSPLITSIZE))
+train_dataset = ds.skip(int(size * constants.TESTSPLITSIZE))
 
 # plot some samples
-"""
-for low_image, full_image in test_dataset.take(5):
-    print(low_image.shape, full_image.shape)
-    plt.imshow(low_image)
-    plt.show()
-    plt.imshow(full_image)
-    plt.show()
-"""
-# batching
-#test_dataset = test_dataset.batch(constants.BATCHSIZE)
-#train_dataset = train_dataset.batch(constants.BATCHSIZE)
 
-#test_dataset = test_dataset.batch(1)
-#train_dataset = train_dataset.batch(1)
+# for low_image, full_image in test_dataset.take(5):
+#     print(low_image.shape, full_image.shape)
+#     plt.imshow(low_image)
+#     plt.show()
+#     plt.imshow(full_image)
+#     plt.show()
+
+# batching
+test_dataset = test_dataset.batch(constants.BATCHSIZE)
+train_dataset = train_dataset.batch(constants.BATCHSIZE)
 
 # shuffling
-#test_dataset = test_dataset.shuffle(buffer_size=constants.BUFFERSIZE)
-#train_dataset = train_dataset.shuffle(buffer_size=constants.BUFFERSIZE)
+test_dataset = test_dataset.shuffle(buffer_size=constants.BUFFERSIZE)
+train_dataset = train_dataset.shuffle(buffer_size=constants.BUFFERSIZE)
 
 # prefetching
 train_dataset = train_dataset.prefetch(constants.PREFETCHSIZE)
@@ -164,3 +161,25 @@ loss_desc = []
 print("beginne Training")
 
 train(test_dataset, constants.EPOCHS)
+
+# try to upscale one image
+
+
+for low_image, high_image in test_dataset.take(1):
+    upscaled_image = generator(low_image, training=False)
+    plt.imshow(low_image[0, :, :, 0])
+    plt.show()
+    plt.imshow(upscaled_image[0, :, :, 0])
+    plt.show()
+    plt.imshow(high_image[0, :, :, 0])
+    plt.show()
+
+# plot loss
+
+fig = plt.figure()
+line1, = plt.plot(loss_gen)
+line2, = plt.plot(loss_desc)
+plt.xlabel("Training steps")
+plt.ylabel("Loss")
+plt.legend((line1,line2),("generator","discriminator"))
+plt.show()
