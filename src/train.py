@@ -50,16 +50,17 @@ def discriminator_loss(real_img_lbl, fake_img_lbl):
 def train(dataset, epochs):
     for epoch in range(epochs):
         start = time.time()
-        if epoch % constants.CHECKPOINTINTERVAL == 0:
-            generator.save_weights(f'../weights/{start_string}/gen_{int(epoch)}')
-            discriminator.save_weights(f'../weights/{start_string}/dis_{int(epoch)}')
-    
+        
         for data in dataset:
             (loss1, loss2) = train_step(data)
             loss_gen.append(loss1)
             loss_desc.append(loss2)
 
         print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
+
+        if epoch % constants.CHECKPOINTINTERVAL == 0:
+            generator.save_weights(f'../weights/{start_string}/gen_{int(epoch)}')
+            discriminator.save_weights(f'../weights/{start_string}/dis_{int(epoch)}')
 
         
 
