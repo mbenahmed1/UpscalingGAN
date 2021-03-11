@@ -12,6 +12,11 @@ import constants
 import os
 import matplotlib.pyplot as plt
 import time
+from datetime import datetime
+
+# taking start time for weight saving
+started_training = datetime.now()
+start_string = started_training.strftime(constants.WHEIGTSPATH)
 
 # disabling gpu if needed
 if not constants.USEGPU:
@@ -45,7 +50,9 @@ def discriminator_loss(real_img_lbl, fake_img_lbl):
 def train(dataset, epochs):
     for epoch in range(epochs):
         start = time.time()
-
+        if epoch % constants.CHECKPOINTINTERVAL == 0:
+            generator.save_weights(f'../weights/{start_string}/gen_{int(epoch)}')
+            discriminator.save_weights(f'../weights/{start_string}/dis_{int(epoch)}')
     
         for data in dataset:
             (loss1, loss2) = train_step(data)
@@ -54,10 +61,11 @@ def train(dataset, epochs):
 
         print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
 
+        
+
 
 @tf.function
 def train_step(images):
-    noise = tf.random.normal([constants.BATCHSIZE, noise_dim])
     image_lowRes = images[0]
     images_highRes = images[1]
 
@@ -74,6 +82,7 @@ def train_step(images):
         gen_loss, generator.trainable_variables)
     gradients_of_discriminator = disc_tape.gradient(
         disc_loss, discriminator.trainable_variables)
+    
 
     generator_optimizer.apply_gradients(
         zip(gradients_of_generator, generator.trainable_variables))
@@ -157,8 +166,17 @@ seed = tf.random.normal([num_examples_to_generate, noise_dim])
 
 loss_gen = []
 loss_desc = []
+print("")
+print("")
+print("Start training")
 
-print("beginne Training")
+generator.build((constants.BATCHSIZE, constants.LOWIMAGESIZE, constants.LOWIMAGESIZE, constants.NUMCHANNELS))
+discriminator.build((constants.BATCHSIZE, constants.FULLIMAGESIZE, constants.FULLIMAGESIZE, constants.NUMCHANNELS))
+
+print("")
+print("")
+print(generator.summary())
+print(discriminator.summary())
 
 train(test_dataset, constants.EPOCHS)
 
@@ -170,9 +188,9 @@ for low_image, high_image in test_dataset.take(1):
     plt.imshow(low_image[0, :, :, 0])
     plt.show()
     plt.imshow(upscaled_image[0, :, :, 0])
-    plt.show()
+    plt.savefig(f'../weights/{start_string}/upscaled.pdf')
     plt.imshow(high_image[0, :, :, 0])
-    plt.show()
+    plt.savefig(f'../weights/{start_string}/original.pdf')
 
 # plot loss
 
@@ -182,4 +200,4 @@ line2, = plt.plot(loss_desc)
 plt.xlabel("Training steps")
 plt.ylabel("Loss")
 plt.legend((line1,line2),("generator","discriminator"))
-plt.show()
+plt.savefig(f'../weights/{start_string}/loss.pdf')
