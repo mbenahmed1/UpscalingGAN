@@ -8,8 +8,41 @@ which consists of the Generator and the Discriminator Part.
 import tensorflow as tf
 import tensorflow.keras.layers as layers
 import tensorflow.keras.activations as activations
+from tensorflow.keras.layers import Layer
 import constants
 
+class ResidualBlock(Layer):
+    """ Implements a residual block"""
+    def __init__(self):
+
+        super(ResidualBlock, self).__init__()
+
+        self.conv_1     = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), padding="same")
+        self.bn_1       = layers.BatchNormalization()
+        self.prelu_1    = layers.PReLU()
+        
+        self.conv_2     = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), padding="same")
+        self.bn_2       = layers.BatchNormalization()
+        self.prelu_2    = layers.PReLU()
+
+    def call(self, inp, training):
+        """Runs the data through the layers.
+
+        Attributes:
+            inp:            the data
+            training:       training flag
+        """
+        x = self.conv_1(inp)
+        x = self.bn_1(x, training)
+        x = self.prelu_1(x)
+
+        x = self.conv_2(x)
+        x = self.bn_2(x, training)
+        x = self.prelu_2(x)
+
+        x += inp
+
+        return x
 
 class Generator(tf.keras.Model):
     """A class that represents the Generator part of the model.
@@ -23,34 +56,31 @@ class Generator(tf.keras.Model):
         """Inits the Generator."""
         super(Generator, self).__init__()
 
+        # k9n64s1
+        self.conv_1 = layers.Conv2D(filters=64, kernel_size=(9,9), strides=(1,1), padding="same", input_shape=(constants.BATCHSIZE, constants.LOWIMAGESIZE, constants.LOWIMAGESIZE, constants.NUMCHANNELS))
+        self.act_1 = layers.PReLU()
 
-        """
-        self.input_1 = layers.Dense(
-7*7*256, use_bias=False, input_shape=(100,))
-        self.batch_norm_1 = layers.BatchNormalization()
-        #self.act_1 = activations.sigmoid
-        self.act_1 = layers.LeakyReLU()
-        self.reshape_1 = layers.Reshape((7, 7, 256))
-        """
+        # residual blocks
+        self.residual_blocks = [ResidualBlock() for i in range(constants.NUMRESBLOCKS)]
 
-        self.conv_2 = layers.Conv2DTranspose(
-            128, (5, 5), strides=(1, 1), padding='same', use_bias=False, input_shape=(constants.LOWIMAGESIZE, constants.LOWIMAGESIZE, constants.NUMCHANNELS))
-        self.batch_norm_2 = layers.BatchNormalization()
-        #self.act_2 = activations.sigmoid
-        self.act_2 = layers.LeakyReLU()
+        # k3n64s1
+        self.conv_2 = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), padding="same")
+        self.bn_1 = layers.BatchNormalization()
 
-        self.conv_3 = layers.Conv2DTranspose(
-            64, (5, 5), strides=(2, 2), padding='same', use_bias=False)
-        self.batch_norm_3 = layers.BatchNormalization()
-        #self.act_3 = activations.sigmoid
-        self.act_3 = layers.LeakyReLU()
+        # k3n256s1
+        self.conv_3 = layers.Conv2D(filters=256, kernel_size=(3,3), strides=(1,1), padding="same")
+        self.convT_1 = layers.Conv2DTranspose(filters=256, kernel_size=(3,3), strides=(2,2), padding="same")
+        self.act_2 = layers.PReLU()
 
-        self.conv_4 = layers.Conv2DTranspose(
-            constants.NUMCHANNELS, (5, 5), strides=(2, 2), padding='same', use_bias=False)
-        #self.act_4 = activations.sigmoid
-        self.act_4 = layers.LeakyReLU()
+        # k3n256s1
+        self.conv_4 = layers.Conv2D(filters=256, kernel_size=(3,3), strides=(1,1), padding="same")
+        self.convT_1 = layers.Conv2DTranspose(filters=256, kernel_size=(3,3), strides=(2,2), padding="same")
+        self.act_3 = layers.PReLU()
 
-    def call(self, x, training: bool):
+        # k9n3s1
+        self.conv_5 = layers.Conv2D(filters=3, kernel_size=(9,9), strides=(1,1), padding="same")
+
+    def call(self, inp, training: bool):
         """Runs the data through the layers.
 
         Attributes:
@@ -58,23 +88,27 @@ class Generator(tf.keras.Model):
             training:       training flag
         """
 
-        """
-        x = self.input_1(x)
-        x = self.batch_norm_1(x, training)
+        x = self.conv_1(inp)
+        x = self.bn_1(x, training)
         x = self.act_1(x)
-        x = self.reshape_1(x)
-        """
+
+        for layer in self.residual_blocks:
+            x = layer(x, training)
 
         x = self.conv_2(x)
-        x = self.batch_norm_2(x, training)
-        x = self.act_2(x)
+        x = self.bn_1(x, training)
+
+        #x += inp
 
         x = self.conv_3(x)
-        x = self.batch_norm_3(x, training)
-        x = self.act_3(x)
+        x = self.convT_1(x)
+        x = self.act_2(x)
 
         x = self.conv_4(x)
-        x = self.act_4(x)
+        x = self.convT_1(x)
+        x = self.act_3(x)
+
+        x = self.conv_5(x)
 
         return x
 
@@ -93,18 +127,48 @@ class Discriminator(tf.keras.Model):
         """Inits the Discriminator."""
         super(Discriminator, self).__init__()
 
-        self.conv_1 = layers.Conv2D(64, (5, 5), strides=(
-            2, 2), padding='same', input_shape=(constants.FULLIMAGESIZE, constants.FULLIMAGESIZE, constants.NUMCHANNELS))
-        self.act_1 = activations.sigmoid
-        self.dropout_1 = layers.Dropout(0.3)
+        # k3n64s1
+        self.conv_1 = layers.Conv2D(filters=64, kernel_size=(9,9), strides=(1,1), padding="same")
+        self.act_1 = layers.LeakyReLU()
 
-        self.conv_2 = layers.Conv2D(
-            128, (5, 5), strides=(2, 2), padding='same')
-        self.act_2 = activations.sigmoid
-        self.dropout_2 = layers.Dropout(0.3)
+        # k3n64s2
+        self.conv_2 = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(2,2), padding="same")
+        self.bn_1 = layers.BatchNormalization()
+        self.act_2 = layers.LeakyReLU()
 
-        self.flatten_3 = layers.Flatten()
-        self.out_3 = layers.Dense(1)
+        # k3n128s1
+        self.conv_3 = layers.Conv2D(filters=128, kernel_size=(3,3), strides=(1,1), padding="same")
+        self.bn_2 = layers.BatchNormalization()
+        self.act_3 = layers.LeakyReLU()
+
+        # k3n128s2
+        self.conv_4 = layers.Conv2D(filters=128, kernel_size=(3,3), strides=(2,2), padding="same")
+        self.bn_3 = layers.BatchNormalization()
+        self.act_4 = layers.LeakyReLU()
+
+        # k3n256s1
+        self.conv_5 = layers.Conv2D(filters=256, kernel_size=(3,3), strides=(1,1), padding="same")
+        self.bn_4 = layers.BatchNormalization()
+        self.act_5 = layers.LeakyReLU()
+
+        # k3n256s2
+        self.conv_6 = layers.Conv2D(filters=256, kernel_size=(3,3), strides=(2,2), padding="same")
+        self.bn_5 = layers.BatchNormalization()
+        self.act_6 = layers.LeakyReLU()
+
+        # k3n512s1
+        self.conv_7 = layers.Conv2D(filters=512, kernel_size=(3,3), strides=(1,1), padding="same")
+        self.bn_6 = layers.BatchNormalization()
+        self.act_7 = layers.LeakyReLU()
+
+        # k3n512s2
+        self.conv_8 = layers.Conv2D(filters=512, kernel_size=(3,3), strides=(2,2), padding="same")
+        self.bn_7 = layers.BatchNormalization()
+        self.act_8 = layers.LeakyReLU()
+
+        self.dense_1 = layers.Dense(units=1024)
+        self.act_9 = layers.LeakyReLU()
+        self.out = layers.Dense(units=1, activation=activations.sigmoid)
 
     def call(self, x, training: bool):
         """Runs the data through the layers.
@@ -115,13 +179,37 @@ class Discriminator(tf.keras.Model):
         """
         x = self.conv_1(x)
         x = self.act_1(x)
-        x = self.dropout_1(x)
 
         x = self.conv_2(x)
+        x = self.bn_1(x, training)
         x = self.act_2(x)
-        x = self.dropout_2(x)
 
-        x = self.flatten_3(x)
-        x = self.out_3(x)
+        x = self.conv_3(x)
+        x = self.bn_2(x, training)
+        x = self.act_3(x)
 
+        x = self.conv_4(x)
+        x = self.bn_3(x, training)
+        x = self.act_4(x)
+
+        x = self.conv_5(x)
+        x = self.bn_4(x, training)
+        x = self.act_5(x)
+
+        x = self.conv_6(x)
+        x = self.bn_5(x, training)
+        x = self.act_6(x)
+
+        x = self.conv_7(x)
+        x = self.bn_6(x, training)
+        x = self.act_7(x)
+
+        x = self.conv_8(x)
+        x = self.bn_7(x, training)
+        x = self.act_8(x)
+
+        x = self.dense_1(x)
+        x = self.act_9(x)
+        x = self.out(x)
+        
         return x
