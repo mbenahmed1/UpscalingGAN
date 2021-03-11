@@ -13,10 +13,37 @@ import os
 import matplotlib.pyplot as plt
 import time
 from datetime import datetime
+from pathlib import Path
 
 # taking start time for weight saving
 started_training = datetime.now()
 start_string = started_training.strftime(constants.WHEIGTSPATH)
+started_training_time = time.time()
+# creatin dir
+
+path = f'../weights/{start_string}/'
+
+try:
+    os.makedirs(path)
+except OSError:
+    print("Creating weights directory has failed.")
+else:
+    print("Created weights directory.")
+
+text_file = open(f'../weights/{start_string}/stats.txt', "w+")
+#text_file = open(f'stats.txt', "w+")
+text_file.write(f'Run:              {start_string}\n')
+text_file.write("")
+text_file.write(f'Full:             {constants.FULLIMAGESIZE}\n')
+text_file.write(f'Low:              {constants.LOWIMAGESIZE}\n')
+text_file.write(f'Channels:         {constants.NUMCHANNELS}\n')
+text_file.write(f'ParallelCalls:    {constants.NUMPARALLELCALLS}\n')
+text_file.write(f'Splitsize:        {constants.TESTSPLITSIZE}\n')
+text_file.write(f'Batchsize:        {constants.BATCHSIZE}\n')
+text_file.write(f'Buffersize:       {constants.BUFFERSIZE}\n')
+text_file.write(f'Prefetchsize:     {constants.PREFETCHSIZE}\n')
+text_file.write(f'Epochs:           {constants.EPOCHS}\n')
+text_file.write(f'ResBlocks:        {constants.NUMRESBLOCKS}\n')
 
 # disabling gpu if needed
 if not constants.USEGPU:
@@ -56,14 +83,15 @@ def train(dataset, epochs):
             loss_gen.append(loss1)
             loss_desc.append(loss2)
 
-        print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
 
         if epoch % constants.CHECKPOINTINTERVAL == 0:
             generator.save_weights(f'../weights/{start_string}/gen_{int(epoch)}')
             discriminator.save_weights(f'../weights/{start_string}/dis_{int(epoch)}')
 
-        
-
+        time_per_epoch = int(time.time() - start)
+        epoch_time_string = (f'Time for epoch {epoch} is {time_per_epoch} s')
+        print(epoch_time_string)
+        text_file.write(f'Time e_{epoch}:   {time_per_epoch}')
 
 @tf.function
 def train_step(images):
@@ -157,7 +185,7 @@ test_dataset = test_dataset.prefetch(constants.PREFETCHSIZE)
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
-noise_dim = 100
+noise_dim = 8
 num_examples_to_generate = 16
 
 
@@ -202,3 +230,6 @@ plt.xlabel("Training steps")
 plt.ylabel("Loss")
 plt.legend((line1,line2),("generator","discriminator"))
 plt.savefig(f'../weights/{start_string}/loss.pdf')
+
+time_elapsed = time.time() - started_training_time
+text_file.write(f'Time elapsed:     {time_elapsed}')
