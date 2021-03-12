@@ -183,8 +183,8 @@ test_dataset = test_dataset.prefetch(config.PREFETCHSIZE)
 # *** TRAINING ***
 
 # create optimizers
-generator_optimizer = tf.keras.optimizers.Adam(1e-4)
-discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
+generator_optimizer = tf.keras.optimizers.Adam(config.GENLEARNINGRATE)
+discriminator_optimizer = tf.keras.optimizers.Adam(config.DISLEARNINGRATE)
 
 noise_dim = 8
 num_examples_to_generate = 16
