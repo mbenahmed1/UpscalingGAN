@@ -91,7 +91,7 @@ def train(dataset, epochs):
         time_per_epoch = int(time.time() - start)
         epoch_time_string = (f'Time for epoch {epoch} is {time_per_epoch} s')
         print(epoch_time_string)
-        text_file.write(f'Time e_{epoch}:   {time_per_epoch}')
+        text_file.write(f'Time e_{epoch}:   {time_per_epoch}\n')
 
 @tf.function
 def train_step(images):
@@ -231,5 +231,5 @@ plt.ylabel("Loss")
 plt.legend((line1,line2),("generator","discriminator"))
 plt.savefig(f'../weights/{start_string}/loss.pdf')
 
-time_elapsed = time.time() - started_training_time
-text_file.write(f'Time elapsed:     {time_elapsed}')
+time_elapsed = int((time.time() - started_training_time) / 60)
+text_file.write(f'Time elapsed:     {time_elapsed} min\n')
