@@ -9,7 +9,7 @@ import tensorflow as tf
 import tensorflow.keras.layers as layers
 import tensorflow.keras.activations as activations
 from tensorflow.keras.layers import Layer
-import constants
+import config
 
 class ResidualBlock(Layer):
     """ Implements a residual block"""
@@ -57,11 +57,11 @@ class Generator(tf.keras.Model):
         super(Generator, self).__init__()
 
         # k9n64s1
-        self.conv_1 = layers.Conv2D(filters=64, kernel_size=(9,9), strides=(1,1), padding="same", input_shape=(constants.BATCHSIZE, constants.LOWIMAGESIZE, constants.LOWIMAGESIZE, constants.NUMCHANNELS))
+        self.conv_1 = layers.Conv2D(filters=64, kernel_size=(9,9), strides=(1,1), padding="same", input_shape=(config.BATCHSIZE, config.LOWIMAGESIZE, config.LOWIMAGESIZE, config.NUMCHANNELS))
         self.act_1 = layers.PReLU()
 
         # residual blocks
-        self.residual_blocks = [ResidualBlock() for i in range(constants.NUMRESBLOCKS)]
+        self.residual_blocks = [ResidualBlock() for i in range(config.NUMRESBLOCKS)]
 
         # k3n64s1
         self.conv_2 = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), padding="same")
