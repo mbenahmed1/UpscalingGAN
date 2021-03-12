@@ -92,13 +92,15 @@ class Generator(tf.keras.Model):
         x = self.bn_1(x, training)
         x = self.act_1(x)
 
+        inp_64 = tf.identity(x)
+
         for layer in self.residual_blocks:
             x = layer(x, training)
 
         x = self.conv_2(x)
         x = self.bn_1(x, training)
 
-        #x += inp
+        x += inp_64
 
         x = self.conv_3(x)
         x = self.convT_1(x)
