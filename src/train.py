@@ -8,7 +8,7 @@ and preparing train data.
 import tensorflow as tf
 import utils
 import model
-import constants
+import config
 import os
 import matplotlib.pyplot as plt
 import time
@@ -17,12 +17,11 @@ from pathlib import Path
 
 # taking start time for weight saving
 started_training = datetime.now()
-start_string = started_training.strftime(constants.WHEIGTSPATH)
+start_string = started_training.strftime(config.WHEIGTSPATH)
 started_training_time = time.time()
+
 # creatin dir
-
-path = f'../weights/{start_string}/'
-
+path = f'{config.WEIGHTFOLDERPATH}{start_string}/'
 try:
     os.makedirs(path)
 except OSError:
@@ -30,23 +29,10 @@ except OSError:
 else:
     print("Created weights directory.")
 
-text_file = open(f'../weights/{start_string}/stats.txt', "w+")
-#text_file = open(f'stats.txt', "w+")
-text_file.write(f'Run:              {start_string}\n')
-text_file.write("")
-text_file.write(f'Full:             {constants.FULLIMAGESIZE}\n')
-text_file.write(f'Low:              {constants.LOWIMAGESIZE}\n')
-text_file.write(f'Channels:         {constants.NUMCHANNELS}\n')
-text_file.write(f'ParallelCalls:    {constants.NUMPARALLELCALLS}\n')
-text_file.write(f'Splitsize:        {constants.TESTSPLITSIZE}\n')
-text_file.write(f'Batchsize:        {constants.BATCHSIZE}\n')
-text_file.write(f'Buffersize:       {constants.BUFFERSIZE}\n')
-text_file.write(f'Prefetchsize:     {constants.PREFETCHSIZE}\n')
-text_file.write(f'Epochs:           {constants.EPOCHS}\n')
-text_file.write(f'ResBlocks:        {constants.NUMRESBLOCKS}\n')
+utils.write_log(path, start_string)
 
 # disabling gpu if needed
-if not constants.USEGPU:
+if not config.USEGPU:
     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
@@ -74,7 +60,17 @@ def discriminator_loss(real_img_lbl, fake_img_lbl):
     return real_loss + fake_loss
 
 
-def train(dataset, epochs):
+def train(dataset, low_res_image, full_res_image, epochs):
+
+    # saving low res sample image to weights folder
+    plt.imshow(low_res_image[0, :, :, 0])
+    plt.savefig(f'{config.WEIGHTFOLDERPATH}{start_string}/{config.LOWRESIMAGENAME}')
+    
+    # saving full res sample image to weights folder
+    plt.imshow(full_res_image[0, :, :, 0])
+    plt.savefig(f'{config.WEIGHTFOLDERPATH}{start_string}/{config.FULLRESIMAGENAME}')
+    
+    # run training steps for number of epochs
     for epoch in range(epochs):
         start = time.time()
         
@@ -83,15 +79,25 @@ def train(dataset, epochs):
             loss_gen.append(loss1)
             loss_desc.append(loss2)
 
+        # save weights every CHECKPOINTINTERVAL time
+        if epoch % config.CHECKPOINTINTERVAL == 0:
+            generator.save_weights(f'{config.WEIGHTFOLDERPATH}{start_string}/{config.GENERATORFILENAME}{int(epoch)}')
+            discriminator.save_weights(f'{config.WEIGHTFOLDERPATH}{start_string}/{config.DISCRIMINATORFILENAME}{int(epoch)}')
 
-        if epoch % constants.CHECKPOINTINTERVAL == 0:
-            generator.save_weights(f'../weights/{start_string}/gen_{int(epoch)}')
-            discriminator.save_weights(f'../weights/{start_string}/dis_{int(epoch)}')
-
+        # print time elapsed for this particular epoch
         time_per_epoch = int(time.time() - start)
         epoch_time_string = (f'Time for epoch {epoch} is {time_per_epoch} s')
         print(epoch_time_string)
+
+        # write time elapsed for this epoch to file
+        text_file = open(f'{config.WEIGHTFOLDERPATH}{start_string}/{config.OUTPUTFILENAME}', "w+")
         text_file.write(f'Time e_{epoch}:   {time_per_epoch}\n')
+        text_file.close()
+
+        # generate one upscaled image from low res sample and write to folder
+        upscaled_image = generator(low_res_image, training=False)
+        plt.imshow(upscaled_image[0, :, :, 0])
+        plt.savefig(f'{config.WEIGHTFOLDERPATH}{start_string}/{epoch}{config.UPSCALEDIMAGENAME}')
 
 @tf.function
 def train_step(images):
@@ -126,69 +132,64 @@ rng = tf.random.Generator.from_seed(123, alg='philox')
 seed = rng.make_seeds(2)[1]
 
 # loading paths
-list_ds = tf.data.Dataset.list_files(constants.DATAPATH)
+list_ds = tf.data.Dataset.list_files(config.DATAPATH)
 
 # loading and preparing images
-ds = list_ds.map(utils.prepare_images, constants.NUMPARALLELCALLS)
-
-#ds = tf.keras.preprocessing.image_dataset_from_directory('../data', label_mode=None, image_size=(512, 512), batch_size=1)
-#print('Einlesen der Bilder erfolgreich')
+ds = list_ds.map(utils.prepare_images, config.NUMPARALLELCALLS)
 
 # size of the dataset
 size = len(list_ds)
 
 # TODO: make random from image to image
 # applying some augmentations for testing
-ds = ds.map(lambda x: utils.saturate(x, constants.SATURATIONMIN,
-                                     constants.SATURATIONMAX, seed), constants.NUMPARALLELCALLS)
-ds = ds.map(lambda x: utils.flip_left_right(x), constants.NUMPARALLELCALLS)
-ds = ds.map(lambda x: utils.flip_up_down(x), constants.NUMPARALLELCALLS)
+ds = ds.map(lambda x: utils.saturate(x, config.SATURATIONMIN,
+                                     config.SATURATIONMAX, seed), config.NUMPARALLELCALLS)
+ds = ds.map(lambda x: utils.flip_left_right(x), config.NUMPARALLELCALLS)
+ds = ds.map(lambda x: utils.flip_up_down(x), config.NUMPARALLELCALLS)
 ds = ds.map(lambda x: utils.brighten(
-    x, constants.BRIGHTNESSMAXDETLA, seed), constants.NUMPARALLELCALLS)
-ds = ds.map(lambda x: utils.contrast(x, constants.CONTRASTMIN,
-                                     constants.CONTRASTMAX, seed), constants.NUMPARALLELCALLS)
+    x, config.BRIGHTNESSMAXDETLA, seed), config.NUMPARALLELCALLS)
+ds = ds.map(lambda x: utils.contrast(x, config.CONTRASTMIN,
+                                     config.CONTRASTMAX, seed), config.NUMPARALLELCALLS)
 
 # making pairs of the original and the scaled images
-ds = ds.map(utils.make_full_low_pairs, constants.NUMPARALLELCALLS)
+ds = ds.map(utils.make_full_low_pairs, config.NUMPARALLELCALLS)
 
-# splitting dataset into test and train
-# test_dataset = ds.take(int(1000))
-# train_dataset = ds.skip(int(1000)).take(1000)
-
-test_dataset = ds.take(int(size * constants.TESTSPLITSIZE))
-train_dataset = ds.skip(int(size * constants.TESTSPLITSIZE))
+test_dataset = ds.take(int(size * config.TESTSPLITSIZE))
+train_dataset = ds.skip(int(size * config.TESTSPLITSIZE))
 
 # plot some samples
 
-# for low_image, full_image in test_dataset.take(5):
-#     print(low_image.shape, full_image.shape)
-#     plt.imshow(low_image)
-#     plt.show()
-#     plt.imshow(full_image)
-#     plt.show()
+if config.SHOWSAMPLES:
+    for low_image, full_image in test_dataset.take(5):
+        print(low_image.shape, full_image.shape)
+        plt.imshow(low_image)
+        plt.show()
+        plt.imshow(full_image)
+        plt.show()
 
 # batching
-test_dataset = test_dataset.batch(constants.BATCHSIZE)
-train_dataset = train_dataset.batch(constants.BATCHSIZE)
+test_dataset = test_dataset.batch(config.BATCHSIZE)
+train_dataset = train_dataset.batch(config.BATCHSIZE)
 
 # shuffling
-test_dataset = test_dataset.shuffle(buffer_size=constants.BUFFERSIZE)
-train_dataset = train_dataset.shuffle(buffer_size=constants.BUFFERSIZE)
+test_dataset = test_dataset.shuffle(buffer_size=config.BUFFERSIZE)
+train_dataset = train_dataset.shuffle(buffer_size=config.BUFFERSIZE)
 
 # prefetching
-train_dataset = train_dataset.prefetch(constants.PREFETCHSIZE)
-test_dataset = test_dataset.prefetch(constants.PREFETCHSIZE)
+train_dataset = train_dataset.prefetch(config.PREFETCHSIZE)
+test_dataset = test_dataset.prefetch(config.PREFETCHSIZE)
 
 
-# training
+# *** TRAINING ***
 
+# create optimizers
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
 noise_dim = 8
 num_examples_to_generate = 16
 
-
+# create models
 generator = model.Generator()
 discriminator = model.Discriminator()
 seed = tf.random.normal([num_examples_to_generate, noise_dim])
@@ -199,26 +200,21 @@ print("")
 print("")
 print("Start training")
 
-generator.build((constants.BATCHSIZE, constants.LOWIMAGESIZE, constants.LOWIMAGESIZE, constants.NUMCHANNELS))
-discriminator.build((constants.BATCHSIZE, constants.FULLIMAGESIZE, constants.FULLIMAGESIZE, constants.NUMCHANNELS))
+if config.SHOWSUMMARY:
+    generator.build((config.BATCHSIZE, config.LOWIMAGESIZE, config.LOWIMAGESIZE, config.NUMCHANNELS))
+    discriminator.build((config.BATCHSIZE, config.FULLIMAGESIZE, config.FULLIMAGESIZE, config.NUMCHANNELS))
+    print("")
+    print("")
+    print(generator.summary())
+    print(discriminator.summary())
 
-print("")
-print("")
-print(generator.summary())
-print(discriminator.summary())
+full_res_image = []
+low_res_image = []
+for low, full in test_dataset.take(1):
+    low_res_image = low
+    full_res_image = full
 
-train(test_dataset, constants.EPOCHS)
-
-# try to upscale one image
-
-
-for low_image, high_image in test_dataset.take(1):
-    upscaled_image = generator(low_image, training=False)
-    plt.imshow(low_image[0, :, :, 0])
-    plt.imshow(upscaled_image[0, :, :, 0])
-    plt.savefig(f'../weights/{start_string}/upscaled.pdf')
-    plt.imshow(high_image[0, :, :, 0])
-    plt.savefig(f'../weights/{start_string}/original.pdf')
+train(test_dataset, low_res_image, full_res_image, config.EPOCHS)
 
 # plot loss
 
@@ -228,8 +224,10 @@ line2, = plt.plot(loss_desc)
 plt.xlabel("Training steps")
 plt.ylabel("Loss")
 plt.legend((line1,line2),("generator","discriminator"))
-plt.savefig(f'../weights/{start_string}/loss.pdf')
+plt.savefig(f'{config.WEIGHTFOLDERPATH}{start_string}/{config.LOSSFILENAME}')
 
+# write complete time elapsed to file
 time_elapsed = int((time.time() - started_training_time) / 60)
+text_file = open(f'{config.WEIGHTFOLDERPATH}{start_string}{config.OUTPUTFILENAME}', "w+")
 text_file.write(f'Time elapsed:     {time_elapsed} min\n')
 text_file.close()
