@@ -46,7 +46,7 @@ def generator_loss(d_true, d_pred):
     because we want to minimize the difference between them
     --> the more the discriminator thinks the images are real, the better our generator
     """
-    return tf.keras.losses.MSE(y_true=d_true, y_pred=d_pred)
+    return tf.keras.losses.MSE(d_true, d_pred)
 
 
 def discriminator_loss(real_img_lbl, fake_img_lbl):
@@ -153,7 +153,7 @@ ds = ds.map(lambda x: utils.contrast(x, config.CONTRASTMIN,
 
 # making pairs of the original and the scaled images
 ds = ds.map(utils.make_full_low_pairs, config.NUMPARALLELCALLS)
-
+ds = ds.take(int(size * config.DATASETSCALINGFACTOR))
 test_dataset = ds.take(int(size * config.TESTSPLITSIZE))
 train_dataset = ds.skip(int(size * config.TESTSPLITSIZE))
 
@@ -186,7 +186,7 @@ test_dataset = test_dataset.prefetch(config.PREFETCHSIZE)
 generator_optimizer = tf.keras.optimizers.Adam(config.GENLEARNINGRATE)
 discriminator_optimizer = tf.keras.optimizers.Adam(config.DISLEARNINGRATE)
 
-noise_dim = 8
+noise_dim = 100
 num_examples_to_generate = 16
 
 # create models
