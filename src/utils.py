@@ -232,5 +232,5 @@ def write_log(path: str, start_string: str):
     text_file.write(f'Epochs:           {config.EPOCHS}\n')
     text_file.write(f'Gen-LR:           {config.GENLEARNINGRATE}\n')
     text_file.write(f'Dis-LR:           {config.DISLEARNINGRATE}\n')
-    text_file.write(f'ResBlocks:        {config.NUMRESBLOCKS}\n')
+    text_file.write(f'ResBlocks:        {config.NUMRESBLOCKS}\n\n')
     text_file.close()

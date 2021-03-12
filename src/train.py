@@ -90,8 +90,8 @@ def train(dataset, low_res_image, full_res_image, epochs):
         print(epoch_time_string)
 
         # write time elapsed for this epoch to file
-        text_file = open(f'{config.WEIGHTFOLDERPATH}{start_string}/{config.OUTPUTFILENAME}', "w+")
-        text_file.write(f'Time e_{epoch}:   {time_per_epoch}\n')
+        text_file = open(f'{config.WEIGHTFOLDERPATH}{start_string}/{config.OUTPUTFILENAME}', "a")
+        text_file.write(f'Time e_{epoch}:       {time_per_epoch} s \n')
         text_file.close()
 
         # generate one upscaled image from low res sample and write to folder
@@ -228,6 +228,6 @@ plt.savefig(f'{config.WEIGHTFOLDERPATH}{start_string}/{config.LOSSFILENAME}')
 
 # write complete time elapsed to file
 time_elapsed = int((time.time() - started_training_time) / 60)
-text_file = open(f'{config.WEIGHTFOLDERPATH}{start_string}{config.OUTPUTFILENAME}', "w+")
+text_file = open(f'{config.WEIGHTFOLDERPATH}{start_string}{config.OUTPUTFILENAME}', "a")
 text_file.write(f'Time elapsed:     {time_elapsed} min\n')
 text_file.close()
