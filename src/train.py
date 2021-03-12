@@ -215,7 +215,6 @@ train(test_dataset, constants.EPOCHS)
 for low_image, high_image in test_dataset.take(1):
     upscaled_image = generator(low_image, training=False)
     plt.imshow(low_image[0, :, :, 0])
-    plt.show()
     plt.imshow(upscaled_image[0, :, :, 0])
     plt.savefig(f'../weights/{start_string}/upscaled.pdf')
     plt.imshow(high_image[0, :, :, 0])
@@ -233,3 +232,4 @@ plt.savefig(f'../weights/{start_string}/loss.pdf')
 
 time_elapsed = int((time.time() - started_training_time) / 60)
 text_file.write(f'Time elapsed:     {time_elapsed} min\n')
+text_file.close()
