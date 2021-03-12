@@ -101,9 +101,6 @@ def prepare_images(path: str) -> tf.Tensor:
     image = tf.io.read_file(path)
     image = tf.image.decode_jpeg(image)
     image = tf.image.convert_image_dtype(image, tf.float32)
-    if image.shape[2] == 3:
-        image = tf.image.rgb_to_grayscale(image)
-    
 
     # crop and pad if image does not fit in target size
     full_image = tf.image.resize_with_crop_or_pad(
