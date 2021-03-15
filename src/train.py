@@ -35,6 +35,13 @@ utils.write_log(path, start_string)
 if not config.USEGPU:
     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
+# memory growth
+devices = tf.config.list_physical_devices('GPU')
+try:
+    tf.config.experimental.set_memory_growth(devices[0], True)
+except:
+    print('Could not enable memory growth.')
+
 
 bce = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
