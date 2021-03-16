@@ -133,58 +133,59 @@ def train_step(images):
 
     return (gen_loss, disc_loss)
 
+with tf.device('/cpu:0'):
 
-# Create a generator
-rng = tf.random.Generator.from_seed(123, alg='philox')
-seed = rng.make_seeds(2)[1]
+    # Create a generator
+    rng = tf.random.Generator.from_seed(123, alg='philox')
+    seed = rng.make_seeds(2)[1]
 
-# loading paths
-list_ds = tf.data.Dataset.list_files(config.DATAPATH)
+    # loading paths
+    list_ds = tf.data.Dataset.list_files(config.DATAPATH)
 
-# loading and preparing images
-ds = list_ds.map(utils.prepare_images, config.NUMPARALLELCALLS)
+    # loading and preparing images
+    ds = list_ds.map(utils.prepare_images, config.NUMPARALLELCALLS)
 
-# size of the dataset
-size = len(list_ds)
+    # size of the dataset
+    size = len(list_ds)
 
-# TODO: make random from image to image
-# applying some augmentations for testing
-ds = ds.map(lambda x: utils.saturate(x, config.SATURATIONMIN,
-                                     config.SATURATIONMAX, seed), config.NUMPARALLELCALLS)
-ds = ds.map(lambda x: utils.flip_left_right(x), config.NUMPARALLELCALLS)
-ds = ds.map(lambda x: utils.flip_up_down(x), config.NUMPARALLELCALLS)
-ds = ds.map(lambda x: utils.brighten(
-    x, config.BRIGHTNESSMAXDETLA, seed), config.NUMPARALLELCALLS)
-ds = ds.map(lambda x: utils.contrast(x, config.CONTRASTMIN,
-                                     config.CONTRASTMAX, seed), config.NUMPARALLELCALLS)
+    # TODO: make random from image to image
+    # applying some augmentations for testing
+    ds = ds.map(lambda x: utils.saturate(x, config.SATURATIONMIN,
+                                        config.SATURATIONMAX, seed), config.NUMPARALLELCALLS)
+    ds = ds.map(lambda x: utils.flip_left_right(x), config.NUMPARALLELCALLS)
+    ds = ds.map(lambda x: utils.flip_up_down(x), config.NUMPARALLELCALLS)
+    ds = ds.map(lambda x: utils.brighten(
+        x, config.BRIGHTNESSMAXDETLA, seed), config.NUMPARALLELCALLS)
+    ds = ds.map(lambda x: utils.contrast(x, config.CONTRASTMIN,
+                                        config.CONTRASTMAX, seed), config.NUMPARALLELCALLS)
 
-# making pairs of the original and the scaled images
-ds = ds.map(utils.make_full_low_pairs, config.NUMPARALLELCALLS)
-ds = ds.take(int(size * config.DATASETSCALINGFACTOR))
-test_dataset = ds.take(int(size * config.TESTSPLITSIZE))
-train_dataset = ds.skip(int(size * config.TESTSPLITSIZE))
+    # making pairs of the original and the scaled images
+    ds = ds.map(utils.make_full_low_pairs, config.NUMPARALLELCALLS)
+    ds = ds.take(int(size * config.DATASETSCALINGFACTOR))
+    test_dataset = ds.take(int(size * config.TESTSPLITSIZE))
+    train_dataset = ds.skip(int(size * config.TESTSPLITSIZE))
 
-# plot some samples
+    # plot some samples
 
-if config.SHOWSAMPLES:
-    for low_image, full_image in test_dataset.take(5):
-        print(low_image.shape, full_image.shape)
-        plt.imshow(low_image[0, :, :, :])
-        plt.show()
-        plt.imshow(full_image[0, :, :, :])
-        plt.show()
+    if config.SHOWSAMPLES:
+        for low_image, full_image in test_dataset.take(5):
+            print(low_image.shape, full_image.shape)
+            plt.imshow(low_image[0, :, :, :])
+            plt.show()
+            plt.imshow(full_image[0, :, :, :])
+            plt.show()
 
-# batching
-test_dataset = test_dataset.batch(config.BATCHSIZE)
-train_dataset = train_dataset.batch(config.BATCHSIZE)
+    # batching
+    test_dataset = test_dataset.batch(config.BATCHSIZE)
+    train_dataset = train_dataset.batch(config.BATCHSIZE)
 
-# shuffling
-test_dataset = test_dataset.shuffle(buffer_size=config.BUFFERSIZE)
-train_dataset = train_dataset.shuffle(buffer_size=config.BUFFERSIZE)
+    # shuffling
+    test_dataset = test_dataset.shuffle(buffer_size=config.BUFFERSIZE)
+    train_dataset = train_dataset.shuffle(buffer_size=config.BUFFERSIZE)
 
-# prefetching
-train_dataset = train_dataset.prefetch(config.PREFETCHSIZE)
-test_dataset = test_dataset.prefetch(config.PREFETCHSIZE)
+    # prefetching
+    train_dataset = train_dataset.prefetch(config.PREFETCHSIZE)
+    test_dataset = test_dataset.prefetch(config.PREFETCHSIZE)
 
 
 # *** TRAINING ***
