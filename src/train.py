@@ -13,7 +13,6 @@ import os
 import matplotlib.pyplot as plt
 import time
 from datetime import datetime
-from pathlib import Path
 
 # taking start time for weight saving
 started_training = datetime.now()
@@ -37,11 +36,19 @@ if not config.USEGPU:
 
 # memory growth
 devices = tf.config.list_physical_devices('GPU')
-try:
-    tf.config.experimental.set_memory_growth(devices[0], True)
-except:
-    print('Could not enable memory growth.')
 
+if devices:
+    try:
+        tf.config.experimental.set_memory_growth(devices[0], True)
+    except:
+        print('Could not enable memory growth.')
+    if config.ENABLEGPUMEMLIMIT:
+        try:
+            tf.config.experimental.set_virtual_device_configuration(devices[0],
+                [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=config.GPUMEMLIMIT)])
+            print('setting memory limit of ', config.GPUMEMLIMIT)
+        except RuntimeError as e:
+            print(e)
 
 bce = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
@@ -53,7 +60,8 @@ def generator_loss(d_true, d_pred):
     because we want to minimize the difference between them
     --> the more the discriminator thinks the images are real, the better our generator
     """
-    return tf.keras.losses.MSE(d_true, d_pred)
+    # return tf.keras.losses.MSE(d_true, d_pred)
+    return tf.keras.losses.MSE(d_true, d_pred) + bce(tf.ones_like(d_pred), d_pred)
 
 
 def discriminator_loss(real_img_lbl, fake_img_lbl):
@@ -70,11 +78,11 @@ def discriminator_loss(real_img_lbl, fake_img_lbl):
 def train(dataset, low_res_image, full_res_image, epochs):
 
     # saving low res sample image to weights folder
-    plt.imshow(low_res_image[0, :, :, :])
+    plt.imshow((low_res_image[0, :, :, :] + 1) / 2)
     plt.savefig(f'{config.WEIGHTFOLDERPATH}{start_string}/{config.LOWRESIMAGENAME}')
     
     # saving full res sample image to weights folder
-    plt.imshow(full_res_image[0, :, :, :])
+    plt.imshow((full_res_image[0, :, :, :] + 1) / 2)
     plt.savefig(f'{config.WEIGHTFOLDERPATH}{start_string}/{config.FULLRESIMAGENAME}')
     
     # run training steps for number of epochs
@@ -103,6 +111,7 @@ def train(dataset, low_res_image, full_res_image, epochs):
 
         # generate one upscaled image from low res sample and write to folder
         upscaled_image = generator(low_res_image, training=False)
+        upscaled_image = (upscaled_image + 1) / 2
         plt.imshow(upscaled_image[0, :, :, :])
         plt.savefig(f'{config.WEIGHTFOLDERPATH}{start_string}/{epoch}{config.UPSCALEDIMAGENAME}')
 
@@ -150,14 +159,15 @@ with tf.device('/cpu:0'):
 
     # TODO: make random from image to image
     # applying some augmentations for testing
-    ds = ds.map(lambda x: utils.saturate(x, config.SATURATIONMIN,
-                                        config.SATURATIONMAX, seed), config.NUMPARALLELCALLS)
-    ds = ds.map(lambda x: utils.flip_left_right(x), config.NUMPARALLELCALLS)
-    ds = ds.map(lambda x: utils.flip_up_down(x), config.NUMPARALLELCALLS)
-    ds = ds.map(lambda x: utils.brighten(
-        x, config.BRIGHTNESSMAXDETLA, seed), config.NUMPARALLELCALLS)
-    ds = ds.map(lambda x: utils.contrast(x, config.CONTRASTMIN,
-                                        config.CONTRASTMAX, seed), config.NUMPARALLELCALLS)
+    # ds = ds.map(lambda x: utils.saturate(x, config.SATURATIONMIN,
+    #                                     config.SATURATIONMAX, seed), config.NUMPARALLELCALLS)
+    # ds = ds.map(lambda x: utils.flip_left_right(x), config.NUMPARALLELCALLS)
+    # ds = ds.map(lambda x: utils.flip_up_down(x), config.NUMPARALLELCALLS)
+    # ds = ds.map(lambda x: utils.brighten(
+    #     x, config.BRIGHTNESSMAXDETLA, seed), config.NUMPARALLELCALLS)
+    # ds = ds.map(lambda x: utils.contrast(x, config.CONTRASTMIN,
+    #                                     config.CONTRASTMAX, seed), config.NUMPARALLELCALLS)
+
 
     # making pairs of the original and the scaled images
     ds = ds.map(utils.make_full_low_pairs, config.NUMPARALLELCALLS)
@@ -170,9 +180,10 @@ with tf.device('/cpu:0'):
     if config.SHOWSAMPLES:
         for low_image, full_image in test_dataset.take(5):
             print(low_image.shape, full_image.shape)
-            plt.imshow(low_image[0, :, :, :])
+            print(full_image)
+            plt.imshow(low_image[:, :, :])
             plt.show()
-            plt.imshow(full_image[0, :, :, :])
+            plt.imshow(full_image[:, :, :])
             plt.show()
 
     # batching
