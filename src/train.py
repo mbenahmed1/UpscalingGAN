@@ -19,7 +19,7 @@ started_training = datetime.now()
 start_string = started_training.strftime(config.WHEIGTSPATH)
 started_training_time = time.time()
 
-# creatin dir
+# creating dir
 path = f'{config.WEIGHTFOLDERPATH}{start_string}/'
 try:
     os.makedirs(path)
@@ -60,7 +60,7 @@ def generator_loss(d_true, d_pred):
     because we want to minimize the difference between them
     --> the more the discriminator thinks the images are real, the better our generator
     """
-    # return tf.keras.losses.MSE(d_true, d_pred)
+
     return tf.keras.losses.MSE(d_true, d_pred) + bce(tf.ones_like(d_pred), d_pred)
 
 
@@ -159,14 +159,14 @@ with tf.device('/cpu:0'):
 
     # TODO: make random from image to image
     # applying some augmentations for testing
-    # ds = ds.map(lambda x: utils.saturate(x, config.SATURATIONMIN,
-    #                                     config.SATURATIONMAX, seed), config.NUMPARALLELCALLS)
-    # ds = ds.map(lambda x: utils.flip_left_right(x), config.NUMPARALLELCALLS)
-    # ds = ds.map(lambda x: utils.flip_up_down(x), config.NUMPARALLELCALLS)
-    # ds = ds.map(lambda x: utils.brighten(
-    #     x, config.BRIGHTNESSMAXDETLA, seed), config.NUMPARALLELCALLS)
-    # ds = ds.map(lambda x: utils.contrast(x, config.CONTRASTMIN,
-    #                                     config.CONTRASTMAX, seed), config.NUMPARALLELCALLS)
+    ds = ds.map(lambda x: utils.saturate(x, config.SATURATIONMIN,
+                                        config.SATURATIONMAX, seed), config.NUMPARALLELCALLS)
+    ds = ds.map(lambda x: utils.flip_left_right(x), config.NUMPARALLELCALLS)
+    ds = ds.map(lambda x: utils.flip_up_down(x), config.NUMPARALLELCALLS)
+    ds = ds.map(lambda x: utils.brighten(
+        x, config.BRIGHTNESSMAXDETLA, seed), config.NUMPARALLELCALLS)
+    ds = ds.map(lambda x: utils.contrast(x, config.CONTRASTMIN,
+                                        config.CONTRASTMAX, seed), config.NUMPARALLELCALLS)
 
 
     # making pairs of the original and the scaled images

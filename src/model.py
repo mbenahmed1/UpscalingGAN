@@ -68,9 +68,9 @@ class Generator(tf.keras.Model):
         self.bn_1 = layers.BatchNormalization()
 
         # k3n256s1
-        # self.conv_3 = layers.Conv2D(filters=256, kernel_size=(3,3), strides=(1,1), padding="same")
-        # self.convT_1 = layers.Conv2DTranspose(filters=256, kernel_size=(3,3), strides=(2,2), padding="same")
-        # self.act_2 = layers.PReLU()
+        self.conv_3 = layers.Conv2D(filters=256, kernel_size=(3,3), strides=(1,1), padding="same")
+        self.convT_1 = layers.Conv2DTranspose(filters=256, kernel_size=(3,3), strides=(2,2), padding="same", use_bias=False)
+        self.act_2 = layers.PReLU()
 
         # k3n256s1
         self.conv_4 = layers.Conv2D(filters=256, kernel_size=(3,3), strides=(1,1), padding="same")
@@ -102,9 +102,9 @@ class Generator(tf.keras.Model):
 
         x += inp_64
 
-        # x = self.conv_3(x)
-        # x = self.convT_1(x)
-        # x = self.act_2(x)
+        x = self.conv_3(x)
+        x = self.convT_1(x)
+        x = self.act_2(x)
 
         x = self.conv_4(x)
         x = self.convT_1(x)
@@ -159,14 +159,14 @@ class Discriminator(tf.keras.Model):
         self.act_6 = layers.LeakyReLU()
 
         # k3n512s1
-        # self.conv_7 = layers.Conv2D(filters=512, kernel_size=(3,3), strides=(1,1), padding="same")
-        # self.bn_6 = layers.BatchNormalization()
-        # self.act_7 = layers.LeakyReLU()
+        self.conv_7 = layers.Conv2D(filters=512, kernel_size=(3,3), strides=(1,1), padding="same")
+        self.bn_6 = layers.BatchNormalization()
+        self.act_7 = layers.LeakyReLU()
 
         # k3n512s2
-        # self.conv_8 = layers.Conv2D(filters=512, kernel_size=(3,3), strides=(2,2), padding="same")
-        # self.bn_7 = layers.BatchNormalization()
-        # self.act_8 = layers.LeakyReLU()
+        self.conv_8 = layers.Conv2D(filters=512, kernel_size=(3,3), strides=(2,2), padding="same")
+        self.bn_7 = layers.BatchNormalization()
+        self.act_8 = layers.LeakyReLU()
 
         self.dense_1 = layers.Dense(units=1024)
         self.act_9 = layers.LeakyReLU()
@@ -202,13 +202,13 @@ class Discriminator(tf.keras.Model):
         x = self.bn_5(x, training)
         x = self.act_6(x)
 
-        # x = self.conv_7(x)
-        # x = self.bn_6(x, training)
-        # x = self.act_7(x)
+        x = self.conv_7(x)
+        x = self.bn_6(x, training)
+        x = self.act_7(x)
 
-        # x = self.conv_8(x)
-        # x = self.bn_7(x, training)
-        # x = self.act_8(x)
+        x = self.conv_8(x)
+        x = self.bn_7(x, training)
+        x = self.act_8(x)
 
         x = self.dense_1(x)
         x = self.act_9(x)
