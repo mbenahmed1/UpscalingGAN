@@ -39,7 +39,7 @@ def generator_loss(d_true, d_pred):
     because we want to minimize the difference between them
     --> the more the discriminator thinks the images are real, the better our generator
     """
-    return tf.keras.losses.MSE(d_true, d_pred)
+    return tf.keras.losses.MSE(d_true, d_pred) + bce(tf.ones_like(d_pred), d_pred)
 
 
 def discriminator_loss(real_img_lbl, fake_img_lbl):
@@ -56,11 +56,11 @@ def discriminator_loss(real_img_lbl, fake_img_lbl):
 def train(dataset, low_res_image, full_res_image, epochs):
 
     # saving low res sample image to weights folder
-    plt.imshow(low_res_image[0, :, :, :])
+    plt.imshow((low_res_image[0, :, :, :] + 1) / 2)
     plt.savefig("../seq/low_res_image.pdf")
     
     # saving full res sample image to weights folder
-    plt.imshow(full_res_image[0, :, :, :])
+    plt.imshow((full_res_image[0, :, :, :] + 1) / 2)
     plt.savefig("../seq/full_res_image.pdf")
     
     # run training steps for number of epochs
@@ -73,10 +73,9 @@ def train(dataset, low_res_image, full_res_image, epochs):
             loss_desc.append(loss2)
 
         # save weights every CHECKPOINTINTERVAL time
-        if epoch % config.CHECKPOINTINTERVAL == 0:
+        if True:
             generator.save("../seq/gen")
             discriminator.save("../seq/dis")
-
         # print time elapsed for this particular epoch
         time_per_epoch = int(time.time() - start)
         epoch_time_string = (f'Time for epoch {epoch} is {time_per_epoch} s')
@@ -89,6 +88,7 @@ def train(dataset, low_res_image, full_res_image, epochs):
 
         # generate one upscaled image from low res sample and write to folder
         upscaled_image = generator(low_res_image, training=False)
+        upscaled_image = (upscaled_image + 1) / 2
         plt.imshow(upscaled_image[0, :, :, :])
         plt.savefig("../seq/upscaled.pdf")
 
