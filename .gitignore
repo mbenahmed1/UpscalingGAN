@@ -157,3 +157,7 @@ dmypy.json
 *.synctex.gz
 
 report.pdf
+
+# pycharm
+
+src/.idea/
