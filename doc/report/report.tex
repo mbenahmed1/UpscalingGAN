@@ -1,4 +1,4 @@
-\documentclass[11pt,twocolumn,twoside]{IEEEtran}
+\documentclass[11pt,twocolumn,twoside,paper=a4]{IEEEtran}
 \usepackage{amsmath}
 % Swap the comments on the two below lines to toggle the geometry view of the margins, etc...
 %\usepackage[margin=0.75in,headheight=0.45in,showframe]{geometry}
@@ -9,6 +9,8 @@
 \usepackage{fancyhdr}
 \usepackage[utf8]{inputenc}
 \include{graphicsx}
+\usepackage{graphicx}
+\usepackage{subcaption}
 
 \pagestyle{fancy}
 %\renewcommand{\headrulewidth}{0pt}
@@ -39,7 +41,20 @@ inspired by Ledig et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16}.
 TODO
 
 \section{Method}
-TODO
+\subsection{Network architecture}
+\begin{figure}[h] 
+    \centering
+    \begin{subfigure}{0.9\textwidth}
+        \centering
+        % include first image
+        \includegraphics[scale=0.7]{../images/gen_and_dis.pdf}  
+        \caption{Generator and Discriminator Network similar to Ledig et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16} }
+        \label{fig:generator}
+    \end{subfigure}
+    \centering
+    
+    \label{fig:memory_plot}
+\end{figure}
 
 \subsection{Dataset}
 We use the Common Objects in Context Dataset (COCO) by Microsoft~\cite{lin2015microsoft}.
