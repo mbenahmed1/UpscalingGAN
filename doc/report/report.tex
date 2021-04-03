@@ -29,17 +29,16 @@
 \thispagestyle{fancy}
 \begin{abstract}
 New state of the art neural network architectures and ever increasing computational resources
-offer a large potential for new applications of deep learning in real life problems. The omnipresent
-availability of historical image material and the use of advanced deep learning techniques created a desire
-to use written of image data in a new way. Since resolution in historical image data is often very limited
-researchers have developed Generative Adversarial Network (GAN) models to increase resolution in order to make old
-data usable. In this report we describe our approach on recreating a GAN for image super resolution, heavily
+offer a large potential for new applications of deep learning in real life problems.
+In the context of images, GANs play a big role in creating new plausible sample data from a specified input.
+Amongst others, GANs can solve the problem of upscaling an image while increasing its level of detail, making the image look better, when enlarging it. Upscaling is especially useful in context of video games, surveillance cameras or old data with a very low resolution.
+In this report we describe our approach on recreating a GAN for image super resolution, heavily
 inspired by Ledig et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16}.
 \end{abstract}
 
 \section{Motivation}
 
-With TV's and screens getting bigger and an ever increasing resolution the computitional effort to render images for these resolutions rises. Especially in the context of video games, powerful GPU's are needed to render images for high resolutions fast enough. While today most of these graphics cards are really expensive, most of the time they are sold out and it is hard to get a hand on one of them.
+With TV's and screens getting bigger and an ever increasing resolution the computitional effort to render images for these resolutions rises. Especially in the context of video games, powerful GPU's are needed to render images in high resolutions fast enough. While today most of these graphics cards are really expensive, most of the time they are sold out and it is hard to get a hand on one of them.
 
 A solution to this problem is to render frames in a lower quality and upscale them to a bigger resolution in constant time using a neural network, typically utilizing a GAN architecture.
 As a general upscaling would keep the level of detail the same and therefore visibly reduce the quality of the image when viewed on a larger screen with higher resolution, the GAN is supposed to increase the resolution while also increasing the level of detail, which is not possible with computer vision algorithms.
