@@ -17,6 +17,9 @@ BATCHSIZE = 8
 BUFFERSIZE = 32
 PREFETCHSIZE = 1
 
+# inference
+MODELPATH = "../data/production_model/gen/"
+
 # file I/O
 DATAPATH = '../data/unlabeled2017/*'
 IMAGEFILEEXTENSION = "jpg"
