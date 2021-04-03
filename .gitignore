@@ -161,3 +161,4 @@ report.pdf
 # pycharm
 
 src/.idea/
+*.idea
