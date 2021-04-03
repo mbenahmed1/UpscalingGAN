@@ -105,7 +105,7 @@ def prepare_images(path: str) -> tf.Tensor:
     # crop and pad if image does not fit in target size
     full_image = tf.image.resize_with_crop_or_pad(
         image, config.FULLIMAGESIZE, config.FULLIMAGESIZE)
-    full_image = tf.image.per_image_standardization(full_image)
+    # full_image = tf.image.per_image_standardization(full_image)
 
     return full_image
 

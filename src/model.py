@@ -64,21 +64,21 @@ class Generator(tf.keras.Model):
         self.residual_blocks = [ResidualBlock() for i in range(config.NUMRESBLOCKS)]
 
         # k3n64s1
-        self.conv_2 = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), padding="same", use_bias=False)
+        self.conv_2 = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), padding="same")
         self.bn_1 = layers.BatchNormalization()
 
         # k3n256s1
         self.conv_3 = layers.Conv2D(filters=256, kernel_size=(3,3), strides=(1,1), padding="same")
-        self.convT_1 = layers.Conv2DTranspose(filters=256, kernel_size=(3,3), strides=(2,2), padding="same", use_bias=False)
+        self.convT_1 = layers.Conv2DTranspose(filters=256, kernel_size=(3,3), strides=(2,2), padding="same")
         self.act_2 = layers.PReLU()
 
         # k3n256s1
         self.conv_4 = layers.Conv2D(filters=256, kernel_size=(3,3), strides=(1,1), padding="same")
-        self.convT_1 = layers.Conv2DTranspose(filters=256, kernel_size=(3,3), strides=(2,2), padding="same", use_bias=False)
+        self.convT_1 = layers.Conv2DTranspose(filters=256, kernel_size=(3,3), strides=(2,2), padding="same")
         self.act_3 = layers.PReLU()
 
         # k9n3s1
-        self.conv_5 = layers.Conv2D(filters=3, kernel_size=(9,9), strides=(1,1), padding="same", activation="tanh")
+        self.conv_5 = layers.Conv2D(filters=3, kernel_size=(9,9), strides=(1,1), padding="same")
 
     def call(self, inp, training: bool):
         """Runs the data through the layers.
