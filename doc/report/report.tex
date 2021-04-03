@@ -40,7 +40,12 @@ inspired by Ledig et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16}.
 \section{Motivation}
 
 With TV's and screens getting bigger and an ever increasing resolution the computitional effort to render images for these resolutions rises. Especially in the context of video games, powerful GPU's are needed to render images for high resolutions fast enough. While today most of these graphics cards are really expensive, most of the time they are sold out and it is hard to get a hand on one of them.
-A solution to this problem is to render frames in a lower quality and upscale them to a bigger resolution in constant time using a neural network, typically utilizing a GAN architecture. This reduces the time to render frames drastically, which makes it possible to play games on high resolution without the need to buy the most powerful graphics card on the market. 
+
+A solution to this problem is to render frames in a lower quality and upscale them to a bigger resolution in constant time using a neural network, typically utilizing a GAN architecture.
+As a general upscaling would keep the level of detail the same and therefore visibly reduce the quality of the image when viewed on a larger screen with higher resolution, the GAN is supposed to increase the resolution while also increasing the level of detail, which is not possible with computer vision algorithms.
+The idea is, that the GAN creates an intuition on how to add detail to scenes during training.
+
+This reduces the time to render frames drastically, which makes it possible to play games on high resolution without the need to buy the most powerful graphics card on the market. 
 This technique also proves useful in many other szenarios.
 Using upscaling, images with low resolution (e.g. historical data like old fotos or films) can be reprocessed, increasing its usability and esthetic.
 Further, data from surveillance cameras, which typically come at a low resolution, especially when they are older, can be made more useful, as details are increased. Therefore it can be also used to help in crime investigation, especially with further postprocessing steps, like face or object recognition.
