@@ -125,80 +125,75 @@ Nevertheless, all images are biased towards a specific color and some artifacts 
 Furthermore, the edges are sharpened by a fair amount, but this could be improved further.
 The problem on the edges gets way more obvious if an image gets scaled up from patches, as seen in figure~\ref{fig:dog_up}. 
 At the same time, especially the nose of the dog gets smoothed out and looks subjectively more pleasant.
+
 \begin{figure}[ht] 
 
-        \begin{subfigure}{.12\textwidth}
-        \centering
-        % include first image
-        \includegraphics[scale=1]{../images/baby_low.jpg}  
-        \caption{Baby low}
-        \label{fig:baby_low}
-        \end{subfigure} 
-        
-        \begin{subfigure}{.12\textwidth}
-        \centering
-        % include first image
-        \includegraphics[scale=0.25]{../images/baby_up.jpg}  
-        \caption{Baby up}
-        \label{fig:baby_up}
-        \end{subfigure}
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/baby_low.jpg}
+    \caption{Baby low}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/baby_up.jpg}
+    \caption{Baby up}
+  \end{minipage}
+\end{subfigure}
 
-        \begin{subfigure}{.12\textwidth}
-        \centering
-        % include first image
-        \includegraphics[scale=1]{../images/bird_low.jpg}  
-        \caption{Bird low}
-        \label{fig:bird_low}
-        \end{subfigure} 
-        
-        \begin{subfigure}{.12\textwidth}
-        \centering
-        % include first image
-        \includegraphics[scale=0.25]{../images/bird_up.jpg}  
-        \caption{Bird up}
-        \label{fig:bird_up}
-        \end{subfigure}
+\par\bigskip
 
-        \begin{subfigure}{.12\textwidth}
-        \centering
-        % include first image
-        \includegraphics[scale=1]{../images/butterfly_low.jpg}  
-        \caption{Butterfly low}
-        \label{fig:butterfly_low}
-        \end{subfigure} 
-        
-        \begin{subfigure}{.12\textwidth}
-        \centering
-        % include first image
-        \includegraphics[scale=0.25]{../images/butterfly_up.jpg}  
-        \caption{Butterfly up}
-        \label{fig:butterfly_up}
-        \end{subfigure}
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/butterfly_low.jpg}
+    \caption{Butterfly low}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/butterfly_up.jpg}
+    \caption{Buttferfly up}
+  \end{minipage}
+\end{subfigure}
 
-        \begin{subfigure}{.12\textwidth}
-        \centering
-        % include first image
-        \includegraphics[scale=1]{../images/head_low.jpg}  
-        \caption{Head low}
-        \label{fig:head_low}
-        \end{subfigure} 
-        
-        \begin{subfigure}{.12\textwidth}
-        \centering
-        % include first image
-        \includegraphics[scale=0.25]{../images/head_up.jpg}  
-        \caption{Head up}
-        \label{fig:head_up}
-        \end{subfigure}
+\par\bigskip
 
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/bird_low.jpg}
+    \caption{Bird low}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/bird_up.jpg}
+    \caption{Bird up}
+  \end{minipage}
+\end{subfigure}
+
+\par\bigskip
+
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/head_low.jpg}
+    \caption{Head low}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/head_up.jpg}
+    \caption{Head up}
+  \end{minipage}
+\end{subfigure}
 
 
 \label{fig:sample_images}
 \caption{Sample images scaled up by the generator. Images by Bevilacque et al~\cite{BMVC.26.135}}
 \end{figure}
 
+
 \centering
-\begin{figure}[ht]
+\begin{figure}
 
     \begin{subfigure}{.12\textwidth}
     \centering
