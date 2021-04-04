@@ -51,6 +51,7 @@ Using upscaling, images with low resolution (e.g. historical data like old photo
 Further, data from surveillance cameras, which typically come at a low resolution, especially when they are older, can be made more useful, as details are increased. Therefore it can be also used to help in crime investigation, especially with further postprocessing steps, like face or object recognition.
 
 Though there are many different approaches on Super-Resolution like using a ResNet architecture \cite{lim2017enhanced}, a Deep Laplacian Pyramid Network \cite{lai2018fast} or a Sub-Pixel Convolutional Neural Network \cite{shi2016real}, we choose to use the GAN architecture proposed in \cite{DBLP:journals/corr/LedigTHCATTWS16}, as it states to deliver extraordinary results.
+Even though GANs are usually harder to train than the other networks proposed in the previous paragraph, we decided to face the challenge of a training a GAN, as we wanted to examine wether it is worth the extra effort.
 In the following, we describe our recreation of this approach.
 
 \section{Method}
@@ -128,16 +129,21 @@ At the same time, especially the nose of the dog gets smoothed out and looks sub
 
 \begin{figure}[ht] 
 
+\caption{Sample images scaled up by the generator. Images by Bevilacque et al~\cite{BMVC.26.135}}
+\label{fig:sample_images}
+
 \begin{subfigure}{0.45\textwidth}
   \centering
   \begin{minipage}[b]{0.45\textwidth}
     \includegraphics[width=\textwidth]{../images/baby_low.jpg}
     \caption{Baby low}
+    \label{fig:baby_low}
   \end{minipage}
   \hfill
   \begin{minipage}[b]{0.45\textwidth}
     \includegraphics[width=\textwidth]{../images/baby_up.jpg}
     \caption{Baby up}
+    \label{fig:baby_up}
   \end{minipage}
 \end{subfigure}
 
@@ -148,11 +154,13 @@ At the same time, especially the nose of the dog gets smoothed out and looks sub
   \begin{minipage}[b]{0.45\textwidth}
     \includegraphics[width=\textwidth]{../images/butterfly_low.jpg}
     \caption{Butterfly low}
+    \label{fig:butterfly_low}
   \end{minipage}
   \hfill
   \begin{minipage}[b]{0.45\textwidth}
     \includegraphics[width=\textwidth]{../images/butterfly_up.jpg}
     \caption{Buttferfly up}
+    \label{fig:butterfly_up}
   \end{minipage}
 \end{subfigure}
 
@@ -163,11 +171,13 @@ At the same time, especially the nose of the dog gets smoothed out and looks sub
   \begin{minipage}[b]{0.45\textwidth}
     \includegraphics[width=\textwidth]{../images/bird_low.jpg}
     \caption{Bird low}
+    \label{fig:bird_low}
   \end{minipage}
   \hfill
   \begin{minipage}[b]{0.45\textwidth}
     \includegraphics[width=\textwidth]{../images/bird_up.jpg}
     \caption{Bird up}
+    \label{fig:bird_up}
   \end{minipage}
 \end{subfigure}
 
@@ -178,17 +188,16 @@ At the same time, especially the nose of the dog gets smoothed out and looks sub
   \begin{minipage}[b]{0.45\textwidth}
     \includegraphics[width=\textwidth]{../images/head_low.jpg}
     \caption{Head low}
+    \label{fig:head_low}
   \end{minipage}
   \hfill
   \begin{minipage}[b]{0.45\textwidth}
     \includegraphics[width=\textwidth]{../images/head_up.jpg}
     \caption{Head up}
+    \label{fig:head_up}
   \end{minipage}
 \end{subfigure}
 
-
-\label{fig:sample_images}
-\caption{Sample images scaled up by the generator. Images by Bevilacque et al~\cite{BMVC.26.135}}
 \end{figure}
 
 
