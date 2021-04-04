@@ -70,12 +70,12 @@ def discriminator_loss(real_img_lbl, fake_img_lbl):
 def train(dataset, low_res_image, full_res_image, epochs):
 
     # saving low res sample image to weights folder
-    plt.imshow(low_res_image[0, :, :, :] + 1) / 2
+    plt.imshow((low_res_image[0, :, :, :] + 1) / 2)
     plt.savefig(
         f'{config.WEIGHTFOLDERPATH}{start_string}/{config.LOWRESIMAGENAME}')
 
     # saving full res sample image to weights folder
-    plt.imshow(full_res_image[0, :, :, :] + 1) / 2
+    plt.imshow((full_res_image[0, :, :, :] + 1) / 2)
     plt.savefig(
         f'{config.WEIGHTFOLDERPATH}{start_string}/{config.FULLRESIMAGENAME}')
 
