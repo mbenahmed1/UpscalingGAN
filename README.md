@@ -17,7 +17,7 @@ in the command line. The path to the unpacked folder is defined in `src/config.p
 Note that `[image.jpg]` is a parameter and must contain a valid path to a jpg image. The output will be saved as `upscaled.jpg` in your current folder.
 
 ### Train
-In order to train the network, it is necessary to download the dataset first. We used parts of the Coco dataset which can be downloaded from https://cocodataset.org/#download . We used the 
+In order to train the network, it is necessary to download the dataset first. We used parts of the Coco dataset which can be downloaded from http://images.cocodataset.org/zips/unlabeled2017.zip. We used the 
 unlabled images with 123k samples. Is has to be extracted and placed in a folder `data` in the root of the directory in order for the algorithm to find it. The path can be redefined in the config, if needed.
 As these images are a mixture of grayscale and color images, everyone of them needs to be converted to rgb in order for the network to handle them.
 This is achieved using the `$ convert_to_rgb.py` in the following manner:
