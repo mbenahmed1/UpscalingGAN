@@ -8,8 +8,8 @@
 \usepackage{amssymb}
 \usepackage{fancyhdr}
 \usepackage[utf8]{inputenc}
-\include{graphicsx}
-\usepackage{graphicx}
+
+\usepackage{caption}
 \usepackage{subcaption}
 
 \pagestyle{fancy}
@@ -31,14 +31,14 @@
 New state of the art neural network architectures and ever increasing computational resources
 offer a large potential for new applications of deep learning in real life problems.
 In the context of images, GANs play a big role in creating new plausible sample data from a specified input.
-Amongst others, GANs can solve the problem of upscaling an image while increasing its level of detail, making the image look better, when enlarging it. Upscaling is especially useful in context of video games, surveillance cameras or old data with a very low resolution.
+Amongst others, GANs can solve the problem of upscaling an image while increasing its level of detail, making the image look better when enlarging it. Upscaling is especially useful in context of video games, surveillance cameras or old data with a very low resolution.
 In this report we describe our approach on recreating a GAN for image super resolution, heavily
 inspired by Ledig et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16}.
 \end{abstract}
 
 \section{Motivation}
 
-With TV's and screens getting bigger and an ever increasing resolution the computitional effort to render images for these resolutions rises. Especially in the context of video games, powerful GPU's are needed to render images in high resolutions fast enough. While today most of these graphics cards are really expensive, most of the time they are sold out and it is hard to get a hand on one of them.
+With TVs and screens getting bigger and an ever increasing resolution the computitional effort to render images for these resolutions rises. Especially in the context of video games, powerful GPUs are needed to render images in high resolutions fast enough. While today most of these graphics cards are really expensive, most of the time they are sold out and it is hard to get a hand on one of them.
 
 A solution to this problem is to render frames in a lower quality and upscale them to a bigger resolution in constant time using a neural network, typically utilizing a GAN architecture \cite{watson2020deep}.
 This upscaling is also reffered to as Super-Resolution.
@@ -47,15 +47,16 @@ The idea is, that the GAN creates an intuition on how to add detail to scenes du
 
 This reduces the time to render frames drastically, which makes it possible to play games on high resolution without the need to buy the most powerful graphics card on the market. 
 This technique also proves useful in many other szenarios.
-Using upscaling, images with low resolution (e.g. historical data like old fotos or films) can be reprocessed, increasing its usability and esthetic.
+Using upscaling, images with low resolution (e.g. historical data like old photos or films) can be reprocessed, increasing its usability and asthetic.
 Further, data from surveillance cameras, which typically come at a low resolution, especially when they are older, can be made more useful, as details are increased. Therefore it can be also used to help in crime investigation, especially with further postprocessing steps, like face or object recognition.
 
-Though there are many different approach on Super-Resolution like using a ResNet architecture \cite{lim2017enhanced}, a Depp Laplacian Pyramid Network \cite{lai2018fast} or a Sub-Pixel Convolutional Neural Network \cite{shi2016real}, we choose to use the GAN architecture proposed in \cite{DBLP:journals/corr/LedigTHCATTWS16}, as it states to deliver extraordinary results.
+Though there are many different approaches on Super-Resolution like using a ResNet architecture \cite{lim2017enhanced}, a Deep Laplacian Pyramid Network \cite{lai2018fast} or a Sub-Pixel Convolutional Neural Network \cite{shi2016real}, we choose to use the GAN architecture proposed in \cite{DBLP:journals/corr/LedigTHCATTWS16}, as it states to deliver extraordinary results.
+Even though GANs are usually harder to train than the other networks proposed in the previous paragraph, we decided to face the challenge of a training a GAN, as we wanted to examine wether it is worth the extra effort.
 In the following, we describe our recreation of this approach.
 
 \section{Method}
 \subsection{Network architecture}
-The network architecture shown in figure~\ref{fig:network_architecture} is also heavily inspired by Ledit et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16}.\\
+The network architecture shown in figure~\ref{fig:network_architecture} is also heavily inspired by Ledig et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16}.\\
 The generator starts by utilizing a convolutional layer activated by PReLU. 
 After that, it is followed by a series of residual blocks, 
 which aim to remember the input of the network. 
@@ -79,11 +80,18 @@ All convolutional layers are described by a code consisting of k (kernel size), 
 \end{center}
 
 \subsection{Loss Function}
+The loss of the discriminator is defined as $$L_D = L_{fake} + L_{real}$$ where $L_{fake}$ is the binary cross entropy between the discriminator prediction and the ground truth for real images and where $L_{real}$ is the binary cross entropy between the discriminator prediction and the ground truth for fake images.\\
+\\
+The loss of the generator is defined as $$L_G = L_{G_1} + L_{G_2}$$ where $$L_{G_1}  = {1 \over MN} \sum_{x=1}^M \sum_{y=1}^N (Y_{x,y} - \hat{Y}_{x,y})^2$$ is the pixel-wise Mean Square Error with $Y$ being the original image and $\hat{Y}$ being the generated image. $L_{G_2}$ is the loss of the discriminator.\\
+\\
+We decided against a more complex approach as described by Ledig et al. \cite{DBLP:journals/corr/LedigTHCATTWS16}, as it seemed to not fit the scope of the project in terms of complexity. However, we expect our results to be better with more sophisticated loss functions.
+
 
 \section{Experiments}
 
 \subsection{Dataset}
-We use the Common Objects in Context Dataset (COCO) by Microsoft~\cite{lin2015microsoft}.
+The 2017 Unlabeled images dataset from the Common Objects in Context Dataset (COCO) by Microsoft~\cite{lin2015microsoft} was used as the training dataset. This dataset consists of 123,000 unlabeled images. A dataset of a relatively smaller size has been chosen to minimize the training effort. The images are sourced from 80 object categories. \\
+As the dataset consisted of both greyscale and RGB images, all non-RGB images were converted to RGB. This was done via a python script as a one-time operation.
 
 
 \subsection{Training}
@@ -102,11 +110,138 @@ This was the only practical way to train the network for a decent number of iter
 One training iteration took approximately 800 seconds. The training of 1000 iterations took about 220 hours in total.
 
 
+\subsection{Inference}
+Since the generator network was trained with an input size of 64 by 64 pixels, upscaling larger images is not directly possible.
+For this reason, we implemented a program to split images into patches of size 64 by 64, to be able to run them through the generator.
+After each patch is scaled up to 256 by 256 pixels, the patches are set back together, resulting in an image that is four times larger then the input. 
+Our git repository features a version of the trained network and the script to perform upscaling on any jpg images.
+
 \section*{Discussion}
-TODO
+\subsection{Results}
+After 1000 training iterations, the generated images show some of the criteria the upscaling process aims to fulfill.
+As seen in figure~\ref{fig:sample_images}, all upscaled images appear a bit more clear and sharp and thus make details easier for the human eye to observe.
+In figure~\ref{fig:baby_up}, the nostrils of the baby are way more naturally shaped than in the low resolution image. 
+In figure~\ref{fig:butterfly_up}, the patterns on the butterfly's wings are smoothed out. 
+Nevertheless, all images are biased towards a specific color and some artifacts show around the edges of the images.
+Extreme contrasts cause color anomalies, as seen in figure~\ref{fig:dog_up} in the area of the dog tag and the forehead.
+Furthermore, the edges are sharpened by a fair amount, but this could be improved further.
+The problem on the edges gets way more obvious if an image gets scaled up from patches, as seen in figure~\ref{fig:dog_up}. 
+At the same time, especially the nose of the dog gets smoothed out and looks subjectively more pleasant.
+
+\begin{figure}[ht] 
+
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/baby_low.jpg}
+    \caption{Baby low}
+    \label{fig:baby_low}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/baby_up.jpg}
+    \caption{Baby up}
+    \label{fig:baby_up}
+  \end{minipage}
+\end{subfigure}
+
+\par\bigskip
+
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/butterfly_low.jpg}
+    \caption{Butterfly low}
+    \label{fig:butterfly_low}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/butterfly_up.jpg}
+    \caption{Buttferfly up}
+    \label{fig:butterfly_up}
+  \end{minipage}
+\end{subfigure}
+
+\par\bigskip
+
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/bird_low.jpg}
+    \caption{Bird low}
+    \label{fig:bird_low}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/bird_up.jpg}
+    \caption{Bird up}
+    \label{fig:bird_up}
+  \end{minipage}
+\end{subfigure}
+
+\par\bigskip
+
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/head_low.jpg}
+    \caption{Head low}
+    \label{fig:head_low}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{../images/head_up.jpg}
+    \caption{Head up}
+    \label{fig:head_up}
+  \end{minipage}
+\end{subfigure}
+
+\caption{Sample images scaled up by the generator. Images by Bevilacque et al~\cite{BMVC.26.135}}
+\label{fig:sample_images}
+
+\end{figure}
+
+
+
+\begin{figure}
+
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \begin{minipage}[b]{\textwidth}
+    \includegraphics[width=\textwidth]{../images/dog_low.jpg}
+    \caption{Dog low}
+    \label{fig:dog_low}
+  \end{minipage}
+
+  \par\bigskip
+  \begin{minipage}[b]{\textwidth}
+    \includegraphics[width=\textwidth]{../images/dog_up.jpg}
+    \caption{Dog up}
+    \label{fig:dog_up}
+  \end{minipage}
+\end{subfigure}
+
+
+\label{fig:large_image}
+\caption{Large image scaled up in patches.}
+
+    
+\end{figure}
+
+\subsection{Improvements}
+As stated in the results subsection, the results of the generator can be improved in many ways. 
+First of all, as seen in the paper of Ledig et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16}, more training iterations are necessary to achieve better upscaling results.
+In the evaluation, Ledig starts comparing their approach to other approaches after at least 20,000 training iterations.\\
+Also, improving the edges of the scaled patches by changing the padding may be an idea for the future. Despite the artifacts on the edges becoming dramatically less prominent over the last 500 training
+iterations, they are still really noticeable in the patched large image.
+The color bias is another problem which should be avoided.
+In some extreme contrast situations, color anomalies appear. This should not be the case, since the range of color values is already limited. 
+
 
 \section*{Conclusion}
-TODO
+Reimplementing the GAN super resolution approach by Ledig et al. resulted in relatively good results in respect to the training time and implementational afford.
+Despite the scaled images showing some quality deficits, the results were quite impressive and promising. 
+However, the network and hyperparameters need further improvement to achieve better results and more computational resources in general to be trained adequately.
 
 
 \bibliographystyle{ieeetr}
