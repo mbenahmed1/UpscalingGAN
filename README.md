@@ -26,6 +26,7 @@ This is achieved using the `$ convert_to_rgb.py` in the following manner:
 After this conversion, the training process can be started with `$ python3 train.py`.
 This will create a folder containing intermediate results.
 
+A conda environment is provided with `UpscalingGAN.yml`.
 
 ## Abstract
 
