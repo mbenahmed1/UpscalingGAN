@@ -10,9 +10,11 @@ In order to try out our trained model, please unpack the `data/production_model/
 
 `$ tar xf gen.tar.gz`
 
-in the command line. The path to the unpacked folder is defined in `src/config.py`. After unpacking, tensorflow is able to read the model from the `gen` folder and you can upscale an image by typing 
+in the command line. The path to the unpacked folder is defined in `src/config.py`. After unpacking, tensorflow is able to read the model from the `gen` folder and you can upscale an image by typing
 
-`$ python3 src/full_image_inference.py [image.jpg]`.
+`$ cd src/`
+
+`$ python3 full_image_inference.py [image.jpg]`.
 
 Note that `[image.jpg]` is a parameter and must contain a valid path to a jpg image. The output will be saved as `upscaled.jpg` in your current folder.
 
