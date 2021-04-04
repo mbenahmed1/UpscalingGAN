@@ -44,7 +44,7 @@ inspired by <cite>Ledig et al. [1]</cite>.
 
 ## More information
 
-More information concerning the used model and training process can be found in the report in `doc` folder of the repository.
+More information concerning the used model and training process can be found in the report https://github.com/mbenahmed1/UpscalingGAN/blob/main/doc/report/report.pdf.
 
 
 
