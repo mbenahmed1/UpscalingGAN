@@ -79,11 +79,14 @@ All convolutional layers are described by a code consisting of k (kernel size), 
 \end{center}
 
 \subsection{Loss Function}
+The loss of the discriminator is defined as $$L_D = L_{fake} + L_{real}$$ where $L_{fake}$ is the binary cross entropy between the discriminator prediction and the ground truth for real images and where $L_{real}$ is the binary cross entropy between the discriminator prediction and the ground truth for fake images.\\
+\\
+The loss of the generator is defined as $$L_G = L_{G_1} + L_{G_2}$$ where $$L_{G_1}  = {1 \over MN} \sum_{x=1}^M \sum_{y=1}^N (Y_{x,y} - \hat{Y}_{x,y})^2$$ with $Y$ being the original image and $\hat{Y}$ being the generated image. $L_{G_2}$ is the loss of the discriminator.
 
 \section{Experiments}
 
 \subsection{Dataset}
-We use the Common Objects in Context Dataset (COCO) by Microsoft~\cite{lin2015microsoft}.
+The 2017 Unlabeled images dataset from the Common Objects in Context Dataset (COCO) by Microsoft~\cite{lin2015microsoft} was used as the training dataset. This dataset consists of 123,000 unlabeled images. As it consisted of both greyscale and RGB images, all non-RGB images were converted to RGB. This was done via a python script as a one-time operation.
 
 
 \subsection{Training}
