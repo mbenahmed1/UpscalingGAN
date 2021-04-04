@@ -122,7 +122,8 @@ After 1000 training iterations, the generated images show some of the criteria t
 As seen in figure~\ref{fig:sample_images}, all upscaled images appear a bit more clear and sharp and thus make details easier for the human eye to observe.
 In figure~\ref{fig:baby_up}, the nostrils of the baby are way more naturally shaped than in the low resolution image. 
 In figure~\ref{fig:butterfly_up}, the patterns on the butterfly's wings are smoothed out. 
-Nevertheless, all images are biased towards a specific color and some artifacts show around the edges of the images. 
+Nevertheless, all images are biased towards a specific color and some artifacts show around the edges of the images.
+Extreme contrasts cause color anomalies, as seen in figure~\ref{fig:dog_up} in the area of the dog tag and the forehead.
 Furthermore, the edges are sharpened by a fair amount, but this could be improved further.
 The problem on the edges gets way more obvious if an image gets scaled up from patches, as seen in figure~\ref{fig:dog_up}. 
 At the same time, especially the nose of the dog gets smoothed out and looks subjectively more pleasant.
@@ -201,7 +202,7 @@ At the same time, especially the nose of the dog gets smoothed out and looks sub
 \end{figure}
 
 
-\centering
+
 \begin{figure}
 
 \begin{subfigure}{0.49\textwidth}
@@ -209,14 +210,14 @@ At the same time, especially the nose of the dog gets smoothed out and looks sub
   \begin{minipage}[b]{\textwidth}
     \includegraphics[width=\textwidth]{../images/dog_low.jpg}
     \caption{Dog low}
-    \label{fig:head_low}
+    \label{fig:dog_low}
   \end{minipage}
 
   \par\bigskip
   \begin{minipage}[b]{\textwidth}
     \includegraphics[width=\textwidth]{../images/dog_up.jpg}
     \caption{Dog up}
-    \label{fig:head_up}
+    \label{fig:dog_up}
   \end{minipage}
 \end{subfigure}
 
@@ -227,13 +228,20 @@ At the same time, especially the nose of the dog gets smoothed out and looks sub
     
 \end{figure}
 
+\subsection{Improvements}
+As stated in the results subsection, the results of the generator can be improved in many ways. 
+First of all, as seen in the paper of Ledig et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16}, more training iterations are necessary to achieve better upscaling results.
+In the evaluation, Ledig starts comparing their approach to other approaches after at least 20,000 training iterations.\\
+Also, improving the edges of the scaled patches by changing the padding may be an idea for the future. Despite the artifacts on the edges becoming dramatically less prominent over the last 500 training
+iterations, they are still really noticeable in the patched large image.
+The color bias is another problem which should be avoided.
+In some extreme contrast situations, color anomalies appear. This should not be the case, since the range of color values is already limited. 
 
-\begin{center}
-    
-\end{center}
 
 \section*{Conclusion}
-TODO
+Reimplementing the GAN super resolution approach by Ledig et al. resulted in relatively good results in respect to the training time and implementational afford.
+Despite the scaled images showing some quality deficits, the results were quite impressive and promising. 
+However, the network and hyperparameters need further improvement to achieve better results and more computational resources in general to be trained adequately.
 
 
 \bibliographystyle{ieeetr}
