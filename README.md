@@ -33,6 +33,10 @@ Amongst others, GANs can solve the problem of upscaling an image while increasin
 In this report we describe our approach on recreating a GAN for image super resolution, heavily
 inspired by <cite>Ledig et al. [1]</cite>.
 
+## More information
+
+More information concerning the used model and training process can be found in the report in ` $doc` folder of the repository.
+
 
 
 [1]: C. Ledig, L. Theis, F. Huszar, J. Caballero, A. P. Aitken,
