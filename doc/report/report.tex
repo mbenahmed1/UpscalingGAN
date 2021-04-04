@@ -31,14 +31,14 @@
 New state of the art neural network architectures and ever increasing computational resources
 offer a large potential for new applications of deep learning in real life problems.
 In the context of images, GANs play a big role in creating new plausible sample data from a specified input.
-Amongst others, GANs can solve the problem of upscaling an image while increasing its level of detail, making the image look better, when enlarging it. Upscaling is especially useful in context of video games, surveillance cameras or old data with a very low resolution.
+Amongst others, GANs can solve the problem of upscaling an image while increasing its level of detail, making the image look better when enlarging it. Upscaling is especially useful in context of video games, surveillance cameras or old data with a very low resolution.
 In this report we describe our approach on recreating a GAN for image super resolution, heavily
 inspired by Ledig et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16}.
 \end{abstract}
 
 \section{Motivation}
 
-With TV's and screens getting bigger and an ever increasing resolution the computitional effort to render images for these resolutions rises. Especially in the context of video games, powerful GPU's are needed to render images in high resolutions fast enough. While today most of these graphics cards are really expensive, most of the time they are sold out and it is hard to get a hand on one of them.
+With TVs and screens getting bigger and an ever increasing resolution the computitional effort to render images for these resolutions rises. Especially in the context of video games, powerful GPUs are needed to render images in high resolutions fast enough. While today most of these graphics cards are really expensive, most of the time they are sold out and it is hard to get a hand on one of them.
 
 A solution to this problem is to render frames in a lower quality and upscale them to a bigger resolution in constant time using a neural network, typically utilizing a GAN architecture \cite{watson2020deep}.
 This upscaling is also reffered to as Super-Resolution.
@@ -47,15 +47,15 @@ The idea is, that the GAN creates an intuition on how to add detail to scenes du
 
 This reduces the time to render frames drastically, which makes it possible to play games on high resolution without the need to buy the most powerful graphics card on the market. 
 This technique also proves useful in many other szenarios.
-Using upscaling, images with low resolution (e.g. historical data like old fotos or films) can be reprocessed, increasing its usability and esthetic.
+Using upscaling, images with low resolution (e.g. historical data like old photos or films) can be reprocessed, increasing its usability and asthetic.
 Further, data from surveillance cameras, which typically come at a low resolution, especially when they are older, can be made more useful, as details are increased. Therefore it can be also used to help in crime investigation, especially with further postprocessing steps, like face or object recognition.
 
-Though there are many different approach on Super-Resolution like using a ResNet architecture \cite{lim2017enhanced}, a Depp Laplacian Pyramid Network \cite{lai2018fast} or a Sub-Pixel Convolutional Neural Network \cite{shi2016real}, we choose to use the GAN architecture proposed in \cite{DBLP:journals/corr/LedigTHCATTWS16}, as it states to deliver extraordinary results.
+Though there are many different approaches on Super-Resolution like using a ResNet architecture \cite{lim2017enhanced}, a Deep Laplacian Pyramid Network \cite{lai2018fast} or a Sub-Pixel Convolutional Neural Network \cite{shi2016real}, we choose to use the GAN architecture proposed in \cite{DBLP:journals/corr/LedigTHCATTWS16}, as it states to deliver extraordinary results.
 In the following, we describe our recreation of this approach.
 
 \section{Method}
 \subsection{Network architecture}
-The network architecture shown in figure~\ref{fig:network_architecture} is also heavily inspired by Ledit et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16}.\\
+The network architecture shown in figure~\ref{fig:network_architecture} is also heavily inspired by Ledig et al.~\cite{DBLP:journals/corr/LedigTHCATTWS16}.\\
 The generator starts by utilizing a convolutional layer activated by PReLU. 
 After that, it is followed by a series of residual blocks, 
 which aim to remember the input of the network. 
@@ -81,12 +81,16 @@ All convolutional layers are described by a code consisting of k (kernel size), 
 \subsection{Loss Function}
 The loss of the discriminator is defined as $$L_D = L_{fake} + L_{real}$$ where $L_{fake}$ is the binary cross entropy between the discriminator prediction and the ground truth for real images and where $L_{real}$ is the binary cross entropy between the discriminator prediction and the ground truth for fake images.\\
 \\
-The loss of the generator is defined as $$L_G = L_{G_1} + L_{G_2}$$ where $$L_{G_1}  = {1 \over MN} \sum_{x=1}^M \sum_{y=1}^N (Y_{x,y} - \hat{Y}_{x,y})^2$$ with $Y$ being the original image and $\hat{Y}$ being the generated image. $L_{G_2}$ is the loss of the discriminator.
+The loss of the generator is defined as $$L_G = L_{G_1} + L_{G_2}$$ where $$L_{G_1}  = {1 \over MN} \sum_{x=1}^M \sum_{y=1}^N (Y_{x,y} - \hat{Y}_{x,y})^2$$ is the pixel-wise Mean Square Error with $Y$ being the original image and $\hat{Y}$ being the generated image. $L_{G_2}$ is the loss of the discriminator.\\
+\\
+We decided against a more complex approach as described by Ledig et al. \cite{DBLP:journals/corr/LedigTHCATTWS16}, as it seemed to not fit the scope of the project in terms of complexity. However, we expect our results to be better with more sophisticated loss functions.
+
 
 \section{Experiments}
 
 \subsection{Dataset}
-The 2017 Unlabeled images dataset from the Common Objects in Context Dataset (COCO) by Microsoft~\cite{lin2015microsoft} was used as the training dataset. This dataset consists of 123,000 unlabeled images. As it consisted of both greyscale and RGB images, all non-RGB images were converted to RGB. This was done via a python script as a one-time operation.
+The 2017 Unlabeled images dataset from the Common Objects in Context Dataset (COCO) by Microsoft~\cite{lin2015microsoft} was used as the training dataset. This dataset consists of 123,000 unlabeled images. A dataset of a relatively smaller size has been chosen to minimize the training effort. The images are sourced from 80 object categories. \\
+As the dataset consisted of both greyscale and RGB images, all non-RGB images were converted to RGB. This was done via a python script as a one-time operation.
 
 
 \subsection{Training}
