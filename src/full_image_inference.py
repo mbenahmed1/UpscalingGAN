@@ -1,6 +1,8 @@
 """inference.py
 
 This file contains a routine to load the model and then apply it to a given image.
+It slices an image into small patches, runs them through the generator and reassembles them
+to upscaled full image.
 """
 
 # imports
@@ -14,7 +16,7 @@ from PIL import Image
 def print_usage():
     """ Prints the usage of the program to console.
     """
-    print("usage: $ python3 inference.py [image.jpg]")
+    print("usage: $ python3 full_image_inference.py [image.jpg]")
 
 
 def upscale_patches(img: np.ndarray):
