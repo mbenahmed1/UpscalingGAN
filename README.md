@@ -4,6 +4,18 @@ This repository contains an Image Upscaling project using a Generative Adversari
 ![low resolution image](doc/images/san-francisco-low.png "low resolution image")![high resolution image](doc/images/san-francisco-full.png "high resolution image")
 image by Garry Miller
 
+## Usage
+### Inference
+In order to try out our trained model, please unpack the `data/production_model/gen.tar.gz`archive by typing </br>
+
+`$ tar xf gen.tar.gz`
+
+in the command line. The path to the unpacked folder is defined in `src/config.py`. After unpacking, tensorflow is able to read the model from the `gen` folder and you can upscale an image by typing 
+
+`$ python3 src/full_image_inference.py [image.jpg]`.
+
+Note that `[image.jpg]` is a parameter and must contain a valid path to a jpg image. The output will be saved as `upscaled.jpg` in your current folder.
+
 ## Method
 ### Network Architecture
 The DNN shown below is heavily inspired by <cite>Ledig et al. [1]</cite>. The GAN consists of two separate networks, which were trained to compete against each other.
