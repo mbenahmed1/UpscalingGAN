@@ -105,7 +105,7 @@ def prepare_images(path: str) -> tf.Tensor:
     # crop and pad if image does not fit in target size
     full_image = tf.image.resize_with_crop_or_pad(
         image, config.FULLIMAGESIZE, config.FULLIMAGESIZE)
-    # full_image = tf.image.per_image_standardization(full_image)
+    full_image = tf.image.per_image_standardization(full_image)
 
     return full_image
 
@@ -117,8 +117,10 @@ def make_full_low_pairs(full_image: tf.Tensor) -> tf.Tensor:
     Parameters:
         full_image:     the full size image
     """
-    low_image = tf.image.resize(full_image, [config.LOWIMAGESIZE, config.LOWIMAGESIZE])
+    low_image = tf.image.resize(
+        full_image, [config.LOWIMAGESIZE, config.LOWIMAGESIZE])
     return low_image, full_image
+
 
 def visualize(original: tf.Tensor, augmented: tf.Tensor):
     """Visualizes original image vs augmented.
@@ -147,7 +149,6 @@ def flip_left_right(image: tf.Tensor) -> tf.Tensor:
         return tf.image.flip_left_right(image)
     else:
         return image
-    
 
 
 def flip_up_down(image: tf.Tensor) -> tf.Tensor:
@@ -160,7 +161,6 @@ def flip_up_down(image: tf.Tensor) -> tf.Tensor:
         return tf.image.flip_up_down(image)
     else:
         return image
-    
 
 
 def saturate(image: tf.Tensor, lower: float, upper: float, seed: tf.Tensor) -> tf.Tensor:
@@ -176,7 +176,6 @@ def saturate(image: tf.Tensor, lower: float, upper: float, seed: tf.Tensor) -> t
         return tf.image.stateless_random_saturation(image, lower, upper, seed)
     else:
         return image
-    
 
 
 def brighten(image: tf.Tensor, max_delta: float, seed: tf.Tensor) -> tf.Tensor:
@@ -191,7 +190,7 @@ def brighten(image: tf.Tensor, max_delta: float, seed: tf.Tensor) -> tf.Tensor:
         return tf.image.stateless_random_brightness(image, max_delta, seed)
     else:
         return image
-    
+
 
 def contrast(image: tf.Tensor, lower: float, upper: float, seed: tf.Tensor) -> tf.Tensor:
     """Takes an image and adjusts its contrast by some random factor
@@ -207,9 +206,10 @@ def contrast(image: tf.Tensor, lower: float, upper: float, seed: tf.Tensor) -> t
     else:
         return image
 
+
 def write_log(path: str, start_string: str):
     """Write log file with all important paramters.
-    
+
     Parameters:
         path:           the path to the folder
         start_string:   the string containing the starting time
