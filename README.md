@@ -6,7 +6,7 @@ This repository contains an Image Upscaling project using a Generative Adversari
 
 ## Usage
 ### Inference
-In order to try out our trained model, please unpack the `data/production_model/gen.tar.gz`archive by typing </br>
+In order to try out our trained model, please unpack the `data/production_model/gen.tar.gz` archive by typing </br>
 
 `$ tar xf gen.tar.gz`
 
@@ -16,14 +16,18 @@ in the command line. The path to the unpacked folder is defined in `src/config.p
 
 Note that `[image.jpg]` is a parameter and must contain a valid path to a jpg image. The output will be saved as `upscaled.jpg` in your current folder.
 
-
+### Train
 In order to train the network, it is necessary to download the dataset first. We used parts of the Coco dataset which can be downloaded from https://cocodataset.org/#download . We used the 
 unlabled images with 123k samples. Is has to be extracted and placed in a folder `data` in the root of the directory in order for the algorithm to find it. The path can be redefined in the config, if needed.
 As these images are a mixture of grayscale and color images, everyone of them needs to be converted to rgb in order for the network to handle them.
 This is achieved using the `$ convert_to_rgb.py` in the following manner:
+
 `$ python3 convert_to_rgb.py [path to folder containing images]`
 
-After this conversion, the training process can be started with `$ python3 train.py`.
+After this conversion, the training process can be started with 
+
+`$ python3 train.py`.
+
 This will create a folder containing intermediate results.
 
 A conda environment is provided with `UpscalingGAN.yml`.
