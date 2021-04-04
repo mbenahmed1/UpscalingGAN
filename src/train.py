@@ -142,6 +142,9 @@ with tf.device('/cpu:0'):
     # loading paths
     list_ds = tf.data.Dataset.list_files(config.DATAPATH)
 
+    # shuffling paths before loading images for more effiency
+    list_ds = list_ds.shuffle(130000)
+
     # loading and preparing images
     ds = list_ds.map(utils.prepare_images, config.NUMPARALLELCALLS)
 
