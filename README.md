@@ -1,8 +1,8 @@
 # UpscalingGAN
 This repository contains an Image Upscaling project using a Generative Adversarial Network (GAN) model. 
 
-![low resolution image](doc/images/san-francisco-low.png "low resolution image")![high resolution image](doc/images/san-francisco-full.png "high resolution image")
-image by Garry Miller
+<img src="https://user-images.githubusercontent.com/33060086/113520398-1df10d00-9593-11eb-873d-96536435cb74.jpg" data-canonical-src="https://user-images.githubusercontent.com/33060086/113520398-1df10d00-9593-11eb-873d-96536435cb74.jpg" width="450" height="450" /> <img src="https://user-images.githubusercontent.com/33060086/113520402-23e6ee00-9593-11eb-97cb-2ef84ee4fba8.jpg" data-canonical-src="https://user-images.githubusercontent.com/33060086/113520402-23e6ee00-9593-11eb-97cb-2ef84ee4fba8.jpg" width="450" height="450" />
+
 
 ## Usage
 ### Inference
