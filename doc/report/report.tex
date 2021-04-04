@@ -8,8 +8,8 @@
 \usepackage{amssymb}
 \usepackage{fancyhdr}
 \usepackage[utf8]{inputenc}
-\include{graphicsx}
-\usepackage{graphicx}
+
+\usepackage{caption}
 \usepackage{subcaption}
 
 \pagestyle{fancy}
@@ -102,8 +102,125 @@ This was the only practical way to train the network for a decent number of iter
 One training iteration took approximately 800 seconds. The training of 1000 iterations took about 220 hours in total.
 
 
+\subsection{Inference}
+Since the generator network was trained with an input size of 64 by 64 pixels, upscaling larger images is not directly possible.
+For this reason, we implemented a program to split images into patches of size 64 by 64, to be able to run them through the generator.
+After each patch is scaled up to 256 by 256 pixels, the patches are set back together, resulting in an image that is four times larger then the input. 
+Our git repository features a version of the trained network and the script to perform upscaling on any jpg images.
+
 \section*{Discussion}
-TODO
+\subsection{Results}
+After 1000 training iterations, the generated images show some of the criteria the upscaling process aims to fulfill.
+As seen in figure~\ref{fig:sample_images}, all upscaled images appear a bit more clear and sharp and thus make details easier for the human eye to observe.
+In figure~\ref{fig:baby_up}, the nostrils of the baby are way more naturally shaped than in the low resolution image. 
+In figure~\ref{fig:butterfly_up}, the patterns on the butterfly's wings are smoothed out. 
+Nevertheless, all images are biased towards a specific color and some artifacts show around the edges of the images. 
+Furthermore, the edges are sharpened by a fair amount, but this could be improved further.
+The problem on the edges gets way more obvious if an image gets scaled up from patches, as seen in figure~\ref{fig:dog_up}. 
+At the same time, especially the nose of the dog gets smoothed out and looks subjectively more pleasant.
+\begin{figure}[ht] 
+
+        \begin{subfigure}{.12\textwidth}
+        \centering
+        % include first image
+        \includegraphics[scale=1]{../images/baby_low.jpg}  
+        \caption{Baby low}
+        \label{fig:baby_low}
+        \end{subfigure} 
+        
+        \begin{subfigure}{.12\textwidth}
+        \centering
+        % include first image
+        \includegraphics[scale=0.25]{../images/baby_up.jpg}  
+        \caption{Baby up}
+        \label{fig:baby_up}
+        \end{subfigure}
+
+        \begin{subfigure}{.12\textwidth}
+        \centering
+        % include first image
+        \includegraphics[scale=1]{../images/bird_low.jpg}  
+        \caption{Bird low}
+        \label{fig:bird_low}
+        \end{subfigure} 
+        
+        \begin{subfigure}{.12\textwidth}
+        \centering
+        % include first image
+        \includegraphics[scale=0.25]{../images/bird_up.jpg}  
+        \caption{Bird up}
+        \label{fig:bird_up}
+        \end{subfigure}
+
+        \begin{subfigure}{.12\textwidth}
+        \centering
+        % include first image
+        \includegraphics[scale=1]{../images/butterfly_low.jpg}  
+        \caption{Butterfly low}
+        \label{fig:butterfly_low}
+        \end{subfigure} 
+        
+        \begin{subfigure}{.12\textwidth}
+        \centering
+        % include first image
+        \includegraphics[scale=0.25]{../images/butterfly_up.jpg}  
+        \caption{Butterfly up}
+        \label{fig:butterfly_up}
+        \end{subfigure}
+
+        \begin{subfigure}{.12\textwidth}
+        \centering
+        % include first image
+        \includegraphics[scale=1]{../images/head_low.jpg}  
+        \caption{Head low}
+        \label{fig:head_low}
+        \end{subfigure} 
+        
+        \begin{subfigure}{.12\textwidth}
+        \centering
+        % include first image
+        \includegraphics[scale=0.25]{../images/head_up.jpg}  
+        \caption{Head up}
+        \label{fig:head_up}
+        \end{subfigure}
+
+
+
+\label{fig:sample_images}
+\caption{Sample images scaled up by the generator. Images by Bevilacque et al~\cite{BMVC.26.135}}
+\end{figure}
+
+\centering
+\begin{figure}[ht]
+
+    \begin{subfigure}{.12\textwidth}
+    \centering
+    % include first image
+    \includegraphics[scale=.5]{../images/dog_low.jpg}  
+    \caption{Dog low}
+    \label{fig:dog_low}
+    \end{subfigure} 
+    
+    \begin{subfigure}{.12\textwidth}
+    \centering 
+    % include first image
+    \includegraphics[scale=0.125]{../images/dog_up.jpg}  
+    \caption{Dog up}
+    \label{fig:dog_up}
+    \end{subfigure} 
+
+
+
+\label{fig:large_image}
+\caption{Large image scaled up in patches.}
+
+    
+\end{figure}
+
+
+\begin{center}
+    
+\end{center}
 
 \section*{Conclusion}
 TODO
